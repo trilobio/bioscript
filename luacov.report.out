@@ -72,8 +72,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   115 for k, v in pairs(complement.COMPLEMENTS) do
-   330    complement.COMPLEMENTS[k:lower()] = v:lower()
+   125 for k, v in pairs(complement.COMPLEMENTS) do
+   360    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -81,13 +81,13 @@ test/synbio/complement.lua
 
 
      5 function complement.reverse_complement(sequence)
- 12520    local s = ""
- 68273    for i = 1, #sequence do
- 55753       local base = sequence:sub(i, i)
- 55753       if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
- 55753       s = s .. complement.COMPLEMENTS[base]
+ 12585    local s = ""
+ 69866    for i = 1, #sequence do
+ 57281       local base = sequence:sub(i, i)
+ 57281       if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+ 57281       s = s .. complement.COMPLEMENTS[base]
           end
- 12520    return s:reverse()
+ 12585    return s:reverse()
        end
 
      5 return complement
@@ -1429,24 +1429,24 @@ test/synbio/pcr.lua
 
      1 function pcr.simulate_simple(sequences, primer_list, target_tm)
 
-    10    local minimal_primer_binds = {}
+    12    local minimal_primer_binds = {}
           local additional_nucleotides
-    41    for idx = 1, #primer_list do
-    31       additional_nucleotides = 1
-    62       primer_list[idx] = primer_list[idx]:upper()
-    31       local minimal_primer = primer_list[idx]:sub(#primer_list[idx] - pcr.minimal_primer_length, -1)
-    31       local found_minimal_primer = true
-   442       while primers.melting_temp(minimal_primer) < target_tm do
-   192          local base_idx = #primer_list[idx] - (pcr.minimal_primer_length + additional_nucleotides)
-   192          if base_idx == 0 then
+    48    for idx = 1, #primer_list do
+    36       additional_nucleotides = 1
+    72       primer_list[idx] = primer_list[idx]:upper()
+    36       local minimal_primer = primer_list[idx]:sub(#primer_list[idx] - pcr.minimal_primer_length, -1)
+    36       local found_minimal_primer = true
+   540       while primers.melting_temp(minimal_primer) < target_tm do
+   236          local base_idx = #primer_list[idx] - (pcr.minimal_primer_length + additional_nucleotides)
+   236          if base_idx == 0 then
      2             found_minimal_primer = false
      2             break
                 end
-   380          minimal_primer = primer_list[idx]:sub(base_idx, -1)
-   190          additional_nucleotides = additional_nucleotides + 1
+   468          minimal_primer = primer_list[idx]:sub(base_idx, -1)
+   234          additional_nucleotides = additional_nucleotides + 1
              end
-    31       if found_minimal_primer then
-    29          minimal_primer_binds[idx] = minimal_primer
+    36       if found_minimal_primer then
+    34          minimal_primer_binds[idx] = minimal_primer
              else
      2          minimal_primer_binds[idx] = ""
              end
@@ -1454,140 +1454,130 @@ test/synbio/pcr.lua
 
 
           local function generate_pcr_fragments(s, f, r, forward_primer_indexes, reverse_primer_indexes)
-    12       local gen_pcr_fragments = {}
-    37       for _, forward_primer_index in ipairs(forward_primer_indexes) do
-    13          local minimal_primer = minimal_primer_binds[forward_primer_index]
-    13          local full_primer_forward = primer_list[forward_primer_index]
-    39          for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
-    13             local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
-    39             local pcr_fragment = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f, r) .. full_primer_reverse
-    13             gen_pcr_fragments[#gen_pcr_fragments + 1] = pcr_fragment
+    17       local gen_pcr_fragments = {}
+    52       for _, forward_primer_index in ipairs(forward_primer_indexes) do
+    18          local minimal_primer = minimal_primer_binds[forward_primer_index]
+    18          local full_primer_forward = primer_list[forward_primer_index]
+    54          for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
+    18             local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
+    54             local pcr_fragment = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f, r) .. full_primer_reverse
+    18             gen_pcr_fragments[#gen_pcr_fragments + 1] = pcr_fragment
                 end
              end
-    12       return gen_pcr_fragments
+    17       return gen_pcr_fragments
           end
 
 
 
-    10    local pcr_fragments = {}
+    12    local pcr_fragments = {}
 
-    30    for _, sequence_record in ipairs(sequences) do
-    10       local sequence = sequence_record.sequence:upper()
+    36    for _, sequence_record in ipairs(sequences) do
+    12       local sequence = sequence_record.sequence:upper()
+
+    12       if sequence_record.circular then
+     4          sequence = sequence .. sequence
+             end
 
 
-    10       local forward_locations = { {} }
-    10       local reverse_locations = { {} }
-    48       for minimal_primer_idx, minimal_primer in ipairs(minimal_primer_binds) do
-    30          if minimal_primer == "" then break end
+    12       local forward_locations = { {} }
+    12       local reverse_locations = { {} }
+    57       for minimal_primer_idx, minimal_primer in ipairs(minimal_primer_binds) do
+    35          if minimal_primer == "" then break end
 
-    28          local search_after = 1
+    33          local search_after = 1
                 while true do
-    45             local match_start = string.find(sequence, minimal_primer, search_after, true)
-    45             if match_start == nil then break end
-    17             if forward_locations[minimal_primer_idx] == nil then
-    11                forward_locations[minimal_primer_idx] = { match_start }
+    57             local match_start = string.find(sequence, minimal_primer, search_after, true)
+    57             if match_start == nil then break end
+    24             if forward_locations[minimal_primer_idx] == nil then
+    12                forward_locations[minimal_primer_idx] = { match_start }
                    else
-     6                forward_locations[minimal_primer_idx][#forward_locations[minimal_primer_idx] + 1] = match_start
+    12                forward_locations[minimal_primer_idx][#forward_locations[minimal_primer_idx] + 1] = match_start
                    end
-    17             search_after = match_start + 1
+    24             search_after = match_start + 1
                 end
 
-    28          search_after = 1
+    33          search_after = 1
                 while true do
-    76             local match_start = string.find(sequence, complement.reverse_complement(minimal_primer), search_after, true)
-    38             if match_start == nil then break end
-    10             if reverse_locations[minimal_primer_idx] == nil then reverse_locations[minimal_primer_idx] = {} end
-    10             reverse_locations[minimal_primer_idx][#reverse_locations[minimal_primer_idx] + 1] = match_start
-    10             search_after = match_start + 1
+    98             local match_start = string.find(sequence, complement.reverse_complement(minimal_primer), search_after, true)
+    49             if match_start == nil then break end
+    16             if reverse_locations[minimal_primer_idx] == nil then reverse_locations[minimal_primer_idx] = {} end
+    16             reverse_locations[minimal_primer_idx][#reverse_locations[minimal_primer_idx] + 1] = match_start
+    16             search_after = match_start + 1
                 end
              end
 
 
 
-    10       local forward_locations_inverted = {}
-    10       local forward_locations_indexes = {}
-    10       local reverse_locations_inverted = {}
-    10       local reverse_locations_indexes = {}
-    31       for idx, values in pairs(forward_locations) do
-    59          for _, value in ipairs(values) do
-    17             if forward_locations_inverted[value] == nil then forward_locations_inverted[value] = {} end
-    17             forward_locations_inverted[value][#forward_locations_inverted[value] + 1] = idx
-    17             forward_locations_indexes[#forward_locations_indexes + 1] = value
+    12       local forward_locations_inverted = {}
+    12       local forward_locations_indexes = {}
+    12       local reverse_locations_inverted = {}
+    12       local reverse_locations_indexes = {}
+    36       for idx, values in pairs(forward_locations) do
+    72          for _, value in ipairs(values) do
+    24             if forward_locations_inverted[value] == nil then forward_locations_inverted[value] = {} end
+    24             forward_locations_inverted[value][#forward_locations_inverted[value] + 1] = idx
+    24             forward_locations_indexes[#forward_locations_indexes + 1] = value
                 end
              end
-    26       for idx, values in pairs(reverse_locations) do
-    42          for _, value in ipairs(values) do
-    10             if reverse_locations_inverted[value] == nil then reverse_locations_inverted[value] = {} end
-    10             reverse_locations_inverted[value][#reverse_locations_inverted[value] + 1] = idx
-    10             reverse_locations_indexes[#reverse_locations_indexes + 1] = value
+    32       for idx, values in pairs(reverse_locations) do
+    56          for _, value in ipairs(values) do
+    16             if reverse_locations_inverted[value] == nil then reverse_locations_inverted[value] = {} end
+    16             reverse_locations_inverted[value][#reverse_locations_inverted[value] + 1] = idx
+    16             reverse_locations_indexes[#reverse_locations_indexes + 1] = value
                 end
              end
 
-    10       table.sort(forward_locations_indexes)
-    10       table.sort(reverse_locations_indexes)
+    12       table.sort(forward_locations_indexes)
+    12       table.sort(reverse_locations_indexes)
 
-    37       for idx, forward_match_start in ipairs(forward_locations_indexes) do
+    48       for idx, forward_match_start in ipairs(forward_locations_indexes) do
 
-    17          if forward_locations_indexes[idx + 1] ~= nil then
+    24          if forward_locations_indexes[idx + 1] ~= nil then
 
-    19             for _, reverse_match_start in ipairs(reverse_locations_indexes) do
-     7                if (forward_match_start < reverse_match_start) and (reverse_match_start < forward_locations_indexes[idx + 1]) then
-     8                   for _, fragment in ipairs(generate_pcr_fragments(sequence, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-     2                      pcr_fragments[#pcr_fragments + 1] = fragment
+    37             for _, reverse_match_start in ipairs(reverse_locations_indexes) do
+    18                if (forward_match_start < reverse_match_start) and (reverse_match_start < forward_locations_indexes[idx + 1]) then
+    20                   for _, fragment in ipairs(generate_pcr_fragments(sequence, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
+     5                      pcr_fragments[#pcr_fragments + 1] = fragment
                          end
-     8                   for _, fragment in ipairs(generate_pcr_fragments(sequence, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-     2                      pcr_fragments[#pcr_fragments + 1] = fragment
+    20                   for _, fragment in ipairs(generate_pcr_fragments(sequence, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
+     5                      pcr_fragments[#pcr_fragments + 1] = fragment
                          end
-     2                   break
+     5                   break
                       end
                    end
                 else
-    10             local found_fragment = false
-    30             for _, reverse_match_start in ipairs(reverse_locations_indexes) do
-    10                if forward_match_start < reverse_match_start then
-    25                   for _, fragment in ipairs(generate_pcr_fragments(sequence, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-     7                      pcr_fragments[#pcr_fragments + 1] = fragment
+    12             local found_fragment = false
+    40             for _, reverse_match_start in ipairs(reverse_locations_indexes) do
+    16                if forward_match_start < reverse_match_start then
+    29                   for _, fragment in ipairs(generate_pcr_fragments(sequence, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
+     8                      pcr_fragments[#pcr_fragments + 1] = fragment
                          end
-     6                   found_fragment = true
-                      end
-                   end
-
-    10             if sequence_record.circular then
-     6                for _, reverse_match_start in ipairs(reverse_locations_indexes) do
-     2                   if forward_locations_indexes[1] > reverse_match_start then
-
-     6                      local rotated_sequence = sequence:sub(forward_match_start, -1) .. sequence:sub(1, forward_match_start)
-     2                      local rotated_forward_location = 1
-     4                      local rotated_reverse_location = #sequence:sub(forward_match_start, -1) + reverse_match_start
-     8                      for _, fragment in ipairs(generate_pcr_fragments(rotated_sequence, rotated_forward_location, rotated_reverse_location, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-     2                         pcr_fragments[#pcr_fragments + 1] = fragment
-                            end
-                         end
+     7                   found_fragment = true
                       end
                    end
                 end
              end
           end
-    10    local fragment_set = {}
-    33    for _, fragment in ipairs(pcr_fragments) do
-    13       fragment_set[fragment] = true
+    12    local fragment_set = {}
+    42    for _, fragment in ipairs(pcr_fragments) do
+    18       fragment_set[fragment] = true
           end
-    10    pcr_fragments = {}
-    21    for fragment, _ in pairs(fragment_set) do
-    11       pcr_fragments[#pcr_fragments + 1] = fragment
+    12    pcr_fragments = {}
+    25    for fragment, _ in pairs(fragment_set) do
+    13       pcr_fragments[#pcr_fragments + 1] = fragment
           end
-    10    return pcr_fragments
+    12    return pcr_fragments
        end
 
      1 function pcr.simulate(sequences, primer_list, target_tm)
-     5    local initial_amplification = pcr.simulate_simple(sequences, primer_list, target_tm)
-     5    if #initial_amplification == 0 then error("no amplicons") end
-    15    for _, fragment in ipairs(initial_amplification) do
-     5       primer_list[#primer_list + 1] = fragment
+     6    local initial_amplification = pcr.simulate_simple(sequences, primer_list, target_tm)
+     6    if #initial_amplification == 0 then error("no amplicons") end
+    18    for _, fragment in ipairs(initial_amplification) do
+     6       primer_list[#primer_list + 1] = fragment
           end
-     5    local subsequent_amplification = pcr.simulate_simple(sequences, primer_list, target_tm)
-     5    if #initial_amplification ~= #subsequent_amplification then error("Concatemerization detected in PCR.") end
-     4    return initial_amplification
+     6    local subsequent_amplification = pcr.simulate_simple(sequences, primer_list, target_tm)
+     6    if #initial_amplification ~= #subsequent_amplification then error("Concatemerization detected in PCR.") end
+     5    return initial_amplification
        end
 
 
@@ -1663,41 +1653,41 @@ test/synbio/primers.lua
 
      2 function primers.santa_lucia(sequence, primer_concentration, salt_concentration, magnesium_concentration)
 
-   270    local melting_temperature = 0
-   270    local dH = 0
-   270    local dS = 0
+   319    local melting_temperature = 0
+   319    local dH = 0
+   319    local dS = 0
 
-   540    sequence = sequence:upper()
-   270    sequence = sequence:gsub("[^ATGC]", "")
-   270    local gas_constant = 1.9872
-   270    local symmetry_factor = 4
+   638    sequence = sequence:upper()
+   319    sequence = sequence:gsub("[^ATGC]", "")
+   319    local gas_constant = 1.9872
+   319    local symmetry_factor = 4
 
 
-   270    dH = dH + primers.initial_thermodynamic_penalty.h
-   270    dS = dS + primers.initial_thermodynamic_penalty.s
+   319    dH = dH + primers.initial_thermodynamic_penalty.h
+   319    dS = dS + primers.initial_thermodynamic_penalty.s
 
-   540    if sequence == complement.reverse_complement(sequence) then
+   638    if sequence == complement.reverse_complement(sequence) then
      1       dH = dH + primers.symmetry_thermodynamic_penalty.h
      1       dS = dS + primers.symmetry_thermodynamic_penalty.s
      1       symmetry_factor = 1
           end
 
-   760    if sequence:sub(-1, -1) == "A" or sequence:sub(-1, -1) == "T" then
+   907    if sequence:sub(-1, -1) == "A" or sequence:sub(-1, -1) == "T" then
     74       dH = dH + primers.terminal_at_thermodynamic_penalty.h
     74       dS = dS + primers.terminal_at_thermodynamic_penalty.s
           end
 
-   270    local salt_effect = salt_concentration + (magnesium_concentration * 140)
-   540    dS = dS + ((0.368 * (sequence:len() - 1)) * math.log(salt_effect))
+   319    local salt_effect = salt_concentration + (magnesium_concentration * 140)
+   638    dS = dS + ((0.368 * (sequence:len() - 1)) * math.log(salt_effect))
 
-  5598    for i = 1, sequence:len() - 1, 1 do
- 10116       local dT = primers.nearest_neighbors_thermodynamics[sequence:sub(i, i + 1)]
-  5058       dH = dH + dT.h
-  5058       dS = dS + dT.s
+  6733    for i = 1, sequence:len() - 1, 1 do
+ 12190       local dT = primers.nearest_neighbors_thermodynamics[sequence:sub(i, i + 1)]
+  6095       dH = dH + dT.h
+  6095       dS = dS + dT.s
           end
 
-   270    melting_temperature = dH * 1000 / (dS + gas_constant * math.log(primer_concentration / symmetry_factor)) - 273.15
-   270    return melting_temperature
+   319    melting_temperature = dH * 1000 / (dS + gas_constant * math.log(primer_concentration / symmetry_factor)) - 273.15
+   319    return melting_temperature
        end
 
 
@@ -1718,10 +1708,10 @@ test/synbio/primers.lua
 
 
      2 function primers.melting_temp(sequence)
-   267    local primer_concentration = 0.000000500
-   267    local salt_concentration = 0.050
-   267    local magnesium_concentration = 0.0
-   267    return primers.santa_lucia(sequence, primer_concentration, salt_concentration, magnesium_concentration)
+   316    local primer_concentration = 0.000000500
+   316    local salt_concentration = 0.050
+   316    local magnesium_concentration = 0.0
+   316    return primers.santa_lucia(sequence, primer_concentration, salt_concentration, magnesium_concentration)
        end
      2 return primers
 
@@ -1737,7 +1727,7 @@ test/synbio/fastq.lua      29   0      100.00%
 test/synbio/fragment.lua   64   30     68.09%
 test/synbio/genbank.lua    232  57     80.28%
 test/synbio/json.lua       187  9      95.41%
-test/synbio/pcr.lua        122  0      100.00%
+test/synbio/pcr.lua        116  0      100.00%
 test/synbio/primers.lua    62   0      100.00%
 -----------------------------------------------
-Total                      731  96     88.39%
+Total                      725  96     88.31%
