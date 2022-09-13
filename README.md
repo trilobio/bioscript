@@ -1,8 +1,9 @@
 # Bioscript
 
-Bioscript is a synthetic biology language.
+Bioscript is a synthetic biology language built for digital representation and physical execution of synthetic biology procedures.
 
-* __Embeddable:__ bioscript can be embedded in larger programs
+* __Reproducible:__ bioscript written today should act the same way as it does 10 years from now.
+* __Embeddable:__ bioscript can be embedded in larger programs.
 * __Modern:__ bioscript is built for engineering in the modern day, from codon optimization to synthesis fixing.
 * __Maintainable:__ bioscript is built for long term stability and continuous testing.
 
