@@ -51,6 +51,12 @@ describe("pcr", function()
       local fragments = pcr.simulate({{sequence = gene, circular = false}}, primers, 55.0)
       assert(#fragments, 1, "Should only have one fragment")
     end)
+
+    it("should work with a primer on the origin",  function()
+      local primers = {"gcgctttcttaaaataattacaccgagataacac", "ctggattcccacaagtcgtcggaaatcgcgtagtac"}
+      local fragments = pcr.simulate({{sequence = gene, circular = true}}, primers, 55.0)
+      assert(#fragments, 1, "Should produce one fragment")
+    end)
   end)
 
   describe("design", function()
