@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/codon.html">codon</a></li>
+  <li><strong>complement</strong></li>
+  <li><a href="../modules/fasta.html">fasta</a></li>
+  <li><a href="../modules/fastq.html">fastq</a></li>
+  <li><a href="../modules/fragment.html">fragment</a></li>
+  <li><a href="../modules/genbank.html">genbank</a></li>
+  <li><a href="../modules/primers.html">primers</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>complement</code></h1>
+<p>The complement module provides functions for getting the reverse complement
+of a given DNA sequence.</p>
+<p>
+<p>DNA, as a double helix, contains two strands of single-stranded DNA bonded to
+each other through hydrogren bonds on each strand's base pairs. In DNA, adenine
+has two hydrogen bonds with the other stand's complementing thymine. Guanine,
+on the other hand, has three hydrogen bonds with the other strand's
+complementing cytosine[1].
+<p>A: Adenine
+<p>T: Thymine
+<p>G: Guanine
+<p>C: Cytosine
+<p>Each DNA strand has a certain direction (known as the 3prime or 5prime end,
+usually written as 3' or 5')[2]. These directions have important biological
+consequences: DNA polymerase can only synthesize DNA in the 5' to 3' direction,
+while oligos can only be chemically synthesized in the 3' to 5' direction. The
+double helix's complementing DNA strands run in opposite directions to each
+other. For example, look at the following DNA sequence:
+<p>5' A T G C 3'
+<p>3' T A C G 5'
+<p>DNA, when read as a string on a computer, is always in the 5' to 3' direction.
+That means the two strands producing the above DNA sequence are "ATGC" and
+"GCAT". When a function makes a "reverse complement" of a strand, it means
+converting from an input of ATGC to an output of GCAT. Reverse complementing
+is important in simulating how enzymes and other strands will interact with
+a DNA strand of interest.
+<p>Finally, there are certain occassions where we need have "degenerate" base
+pairs, which are string representations of different possible base pairs[3].
+There are many of them, but the most common are:
+<p>N (any): A, T, G, C
+<p>W (weak): A, T
+<p>S (strong): G, C
+<p>References:
+<p>[1] https://en.wikipedia.org/wiki/DNA
+<p>[2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
+<p>[3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#reverse_complement">reverse_complement (sequence)</a></td>
+	<td class="summary">Returns reverse complement of a sequence, returns error if unknown character.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#COMPLEMENTS">COMPLEMENTS</a></td>
+	<td class="summary">complement.COMPLEMENTS are DNA base complements.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "reverse_complement"></a>
+    <strong>reverse_complement (sequence)</strong>
+    </dt>
+    <dd>
+    Returns reverse complement of a sequence, returns error if unknown character.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sequence</span>
+         the sequence to reverse complement
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the reverse complement
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> s = complement.reverse_complement(<span class="string">"ATGC"</span>)</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "COMPLEMENTS"></a>
+    <strong>COMPLEMENTS</strong>
+    </dt>
+    <dd>
+    complement.COMPLEMENTS are DNA base complements.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+
+        </li>
+        <li><span class="parameter">B</span>
+
+        </li>
+        <li><span class="parameter">C</span>
+
+        </li>
+        <li><span class="parameter">D</span>
+
+        </li>
+        <li><span class="parameter">G</span>
+
+        </li>
+        <li><span class="parameter">H</span>
+
+        </li>
+        <li><span class="parameter">K</span>
+
+        </li>
+        <li><span class="parameter">M</span>
+
+        </li>
+        <li><span class="parameter">N</span>
+
+        </li>
+        <li><span class="parameter">R</span>
+
+        </li>
+        <li><span class="parameter">S</span>
+
+        </li>
+        <li><span class="parameter">T</span>
+
+        </li>
+        <li><span class="parameter">U</span>
+
+        </li>
+        <li><span class="parameter">V</span>
+
+        </li>
+        <li><span class="parameter">W</span>
+
+        </li>
+        <li><span class="parameter">Y</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-09-14 15:33:08 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

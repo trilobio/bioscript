@@ -2,7 +2,50 @@ local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 th
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 local complement = {}
+
 
 
 
@@ -36,9 +79,11 @@ end
 
 function complement.reverse_complement(sequence)
    local s = ""
+   sequence = sequence:upper()
    for i = 1, #sequence do
-      if complement.COMPLEMENTS[sequence:sub(i, i)] == nil then return "" end
-      s = s .. complement.COMPLEMENTS[sequence:sub(i, i)]
+      local base = sequence:sub(i, i)
+      if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+      s = s .. complement.COMPLEMENTS[base]
    end
    return s:reverse()
 end
@@ -1806,9 +1851,8 @@ end
 
 
 
-
-
 local synbio = {}
+
 
 
 

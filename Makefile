@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-all: test build
+all: test build doc
 
 test:
 	@rm -rf test ;\
@@ -25,3 +25,16 @@ build:
 	mv tmp.tl bioscript.tl ;\
 	tl gen bioscript.tl ;\
 	mv bioscript.lua bioscript.tl build/
+
+doc:
+	@rm -rf doc ;\
+	mkdir doc ;\
+	mkdir tmpdoc ;\
+	find ./src/synbio/ -name "*.tl" | xargs cp -t tmpdoc/ ;\
+	cd tmpdoc ;\
+	for f in *.tl; do mv -- "$$f" "$${f%.tl}.lua" ;\
+	done ;\
+	cd .. ;\
+	rm tmpdoc/synbio.lua ;\
+	ldoc tmpdoc ;\
+	rm -rf tmpdoc

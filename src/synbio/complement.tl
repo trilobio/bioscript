@@ -9,8 +9,11 @@ on the other hand, has three hydrogen bonds with the other strand's
 complementing cytosine[1].
 
 A: Adenine
+
 T: Thymine
+
 G: Guanine
+
 C: Cytosine
 
 Each DNA strand has a certain direction (known as the 3prime or 5prime end,
@@ -21,6 +24,7 @@ double helix's complementing DNA strands run in opposite directions to each
 other. For example, look at the following DNA sequence:
 
 5' A T G C 3'
+
 3' T A C G 5'
 
 DNA, when read as a string on a computer, is always in the 5' to 3' direction.
@@ -35,12 +39,17 @@ pairs, which are string representations of different possible base pairs[3].
 There are many of them, but the most common are:
 
 N (any): A, T, G, C
+
 W (weak): A, T
+
 S (strong): G, C
 
 References:
+
 [1] https://en.wikipedia.org/wiki/DNA
+
 [2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
+
 [3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
 
 ]]-----------------------------------------------------------------------------
@@ -73,12 +82,13 @@ for k, v in pairs(complement.COMPLEMENTS) do
 	complement.COMPLEMENTS[k:lower()] = v:lower()
 end
 
---- Returns reverse complement of a sequence, returns empty string if unknown character.
+--- Returns reverse complement of a sequence, returns error if unknown character.
 -- @param sequence the sequence to reverse complement
 -- @return the reverse complement
 -- @usage local s = complement.reverse_complement("ATGC")
 function complement.reverse_complement(sequence: string): string
 	local s: string = ""
+  sequence = sequence:upper()
 	for i = 1, #sequence do
     local base = sequence:sub(i,i)
 		if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
