@@ -88,6 +88,10 @@ function pcr.simulate_simple(sequences: {pcr.Sequence}, primer_list: {string}, t
 
   for _, sequence_record in ipairs(sequences) do
     local sequence = sequence_record.sequence:upper()
+    -- If the sequence is circular, append it to itself to simulate circularity
+    if sequence_record.circular then
+      sequence = sequence .. sequence
+    end
 
     -- First, find the binding sites for each primer
     local forward_locations: {integer: {integer}} = {{}}
@@ -164,20 +168,6 @@ function pcr.simulate_simple(sequences: {pcr.Sequence}, primer_list: {string}, t
               pcr_fragments[#pcr_fragments+1] = fragment
             end
             found_fragment = true
-          end
-        end
-        -- If the sequence is circular and we haven't found a fragment yet, check the other side of the origin
-        if sequence_record.circular then
-          for _, reverse_match_start in ipairs(reverse_locations_indexes) do
-            if forward_locations_indexes[1] > reverse_match_start then
-              -- If either one of these are true, create a new pcrFragment and append to pcrFragments
-              local rotated_sequence = sequence:sub(forward_match_start, -1) .. sequence:sub(1, forward_match_start)
-              local rotated_forward_location: integer = 1
-              local rotated_reverse_location = #sequence:sub(forward_match_start, -1) + reverse_match_start
-              for _, fragment in ipairs(generate_pcr_fragments(rotated_sequence, rotated_forward_location, rotated_reverse_location, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-                pcr_fragments[#pcr_fragments+1] = fragment
-              end
-            end
           end
         end
       end
