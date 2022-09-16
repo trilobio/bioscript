@@ -19,7 +19,13 @@ build:
 	sed '$$d' src/synbio/genbank.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/fragment.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/codon.tl >> tmp.tl ;\
-	cat src/synbio/synbio.tl >> tmp.tl ;\
+	sed '$$d' src/synbio/synbio.tl >> tmp.tl ;\
+	sed '$$d' src/std/atoms.tl >> tmp.tl ;\
+	sed '$$d' src/std/conversions.tl >> tmp.tl ;\
+	sed '$$d' src/std/mixtures.tl >> tmp.tl ;\
+	sed '$$d' src/std/util.tl >> tmp.tl ;\
+	sed '$$d' src/std/biologic_commands.tl >> tmp.tl ;\
+	cat src/std/std.tl >> tmp.tl ;\
 	sed -i '/require/d' tmp.tl ;\
 	sed -i 's/SUBSTITUTE_WITH_VERSION_NUMBER/0.0.1/g' tmp.tl ;\
 	mv tmp.tl bioscript.tl ;\
