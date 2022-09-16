@@ -332,12 +332,15 @@ Defaults
 local chemicals: {string: mixtures.Chemical} = {
     -- H2O is special because it contributes to calculated volume
     H2O = {inchi = "InChI=1S/H2O/h1H2"},
+    glycerol = {inchi = "InChI=1S/C3H8O3/c4-1-3(6)2-5/h3-6H,1-2H2"},
 
     biotin = {inchi = "InChI=1S/C10H16N2O3S/c13-8(14)4-2-1-3-7-9-6(5-16-7)11-10(15)12-9/h6-7,9H,1-5H2,(H,13,14)(H2,11,12,15)/t6-,7-,9-/m0/s1"},
+    bromophenol_blue = {inchi = "InChI=1S/C19H10Br4O5S/c20-12-5-9(6-13(21)17(12)24)19(10-7-14(22)18(25)15(23)8-10)11-3-1-2-4-16(11)29(26,27)28-19/h1-8,24-25H"},
     C2H3O2K = {inchi = "InChI=1S/C2H4O2.K/c1-2(3)4;/h1H3,(H,3,4);/q;+1/p-1"},
     CaCl2 = {inchi = "InChI=1S/Ca.2ClH/h;2*1H/q+2;;/p-2"},
     CoCl2 = {inchi = "InChI=1S/2ClH.Co/h2*1H;/q;;+2/p-2"},
     CuCl2 = {inchi = "InChI=1S/2ClH.Cu/h2*1H;/q;;+2/p-2"},
+    dithiothreitol = {inchi = "InChI=1S/C4H10O2S2/c5-3(1-7)4(6)2-8/h3-8H,1-2H2"},
     EDTA = {inchi = "InChI=1S/C10H16N2O8/c13-7(14)3-11(4-8(15)16)1-2-12(5-9(17)18)6-10(19)20/h1-6H2,(H,13,14)(H,15,16)(H,17,18)(H,19,20)"},
     FeCl3 = {inchi = "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3"},
     glucose = {inchi = "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1"},
@@ -350,6 +353,7 @@ local chemicals: {string: mixtures.Chemical} = {
     NaCl = {inchi = "InChI=1S/ClH.Na/h1H;/q;+1/p-1"},
     NH4Cl = {inchi = "InChI=1S/ClH.H3N/h1H;1H3"},
     thiamin = {inchi = "InChI=1S/C12H17N4OS/c1-8-11(3-4-17)18-7-16(8)6-10-5-14-9(2)15-12(10)13/h5,7,17H,3-4,6H2,1-2H3,(H2,13,14,15)/q+1"}, -- heat sensitive
+    sds = {inchi = "InChI=1S/C12H26O4S.Na/c1-2-3-4-5-6-7-8-9-10-11-12-16-17(13,14)15;/h2-12H2,1H3,(H,13,14,15);/q;+1/p-1"},
     ZnCl2 = {inchi = "InChI=1S/2ClH.Zn/h2*1H;/q;;+2/p-2"},
 
     -- Buffers
@@ -379,6 +383,13 @@ local chemicals: {string: mixtures.Chemical} = {
     valine = {inchi = "InChI=1S/C5H11NO2/c1-3(2)4(6)5(7)8/h3-4H,6H2,1-2H3,(H,7,8)/t4-/m0/s1"},
     selenocysteine = {inchi = "InChI=1S/C3H6NO2Se/c4-2(1-7)3(5)6/h2H,1,4H2,(H,5,6)/t2-/m0/s1"},
     pyrrolysine = {inchi = "InChI=1S/C12H21N3O3/c1-8-5-7-14-10(8)11(16)15-6-3-2-4-9(13)12(17)18/h7-10H,2-6,13H2,1H3,(H,15,16)(H,17,18)/t8-,9+,10-/m1/s1"},
+}
+
+-- g/cm3
+local density: {string: number} = {
+  chemicals.H2O.inchi = 0.9950 -- https://pubchem.ncbi.nlm.nih.gov/compound/Water#section=Density
+  chemicals.glycerol.inchi = 1.2613 -- https://pubchem.ncbi.nlm.nih.gov/compound/Glycerol#section=Density
+  chemicals.sds.inchi = 1.1 -- https://pubchem.ncbi.nlm.nih.gov/compound/3423265#section=Density
 }
 
 local function formula(self: mixtures.Chemical): string
