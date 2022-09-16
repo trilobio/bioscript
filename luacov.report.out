@@ -75,8 +75,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   140 for k, v in pairs(complement.COMPLEMENTS) do
-   405    complement.COMPLEMENTS[k:lower()] = v:lower()
+   110 for k, v in pairs(complement.COMPLEMENTS) do
+   315    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -84,14 +84,14 @@ test/synbio/complement.lua
 
 
      5 function complement.reverse_complement(sequence)
- 25170    sequence = sequence:upper()
- 12585    local s = ""
- 69866    for i = 1, #sequence do
- 57281       local base = sequence:sub(i, i)
- 57281       if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
- 57281       s = s .. complement.COMPLEMENTS[base]
+ 25422    sequence = sequence:upper()
+ 12711    local s = ""
+ 71750    for i = 1, #sequence do
+ 59039       local base = sequence:sub(i, i)
+ 59039       if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+ 59039       s = s .. complement.COMPLEMENTS[base]
           end
- 12585    return s:reverse()
+ 12711    return s:reverse()
        end
 
      5 return complement
@@ -1418,10 +1418,6 @@ test/synbio/pcr.lua
 
 
 
-
-
-
-
      1 local primers = require("primers")
      1 local complement = require("complement")
 
@@ -1442,7 +1438,8 @@ test/synbio/pcr.lua
 
 
 
-     1 pcr.minimal_primer_length = 15
+
+     1 pcr.minimal_primer_length = 12
 
 
 
@@ -1463,15 +1460,15 @@ test/synbio/pcr.lua
 
      2    local additional_nucleotides = 1
      2    local forward_primer = template:sub(1, pcr.minimal_primer_length)
-    60    while primers.santa_lucia(forward_primer, options.primer_concentration, options.salt_concentration, options.magnesium_concentration) < target_tm do
-    56       forward_primer = template:sub(1, pcr.minimal_primer_length + additional_nucleotides)
-    28       additional_nucleotides = additional_nucleotides + 1
+    72    while primers.santa_lucia(forward_primer, options.primer_concentration, options.salt_concentration, options.magnesium_concentration) < target_tm do
+    68       forward_primer = template:sub(1, pcr.minimal_primer_length + additional_nucleotides)
+    34       additional_nucleotides = additional_nucleotides + 1
           end
      2    additional_nucleotides = 1
      4    local reverse_primer = complement.reverse_complement(template:sub(#template - pcr.minimal_primer_length, -1))
-    28    while primers.santa_lucia(reverse_primer, options.primer_concentration, options.salt_concentration, options.magnesium_concentration) < target_tm do
-    36       reverse_primer = complement.reverse_complement(template:sub(#template - (pcr.minimal_primer_length + additional_nucleotides), -1))
-    12       additional_nucleotides = additional_nucleotides + 1
+    40    while primers.santa_lucia(reverse_primer, options.primer_concentration, options.salt_concentration, options.magnesium_concentration) < target_tm do
+    54       reverse_primer = complement.reverse_complement(template:sub(#template - (pcr.minimal_primer_length + additional_nucleotides), -1))
+    18       additional_nucleotides = additional_nucleotides + 1
           end
 
 
@@ -1507,14 +1504,14 @@ test/synbio/pcr.lua
     72       primer_list[idx] = primer_list[idx]:upper()
     36       local minimal_primer = primer_list[idx]:sub(#primer_list[idx] - pcr.minimal_primer_length, -1)
     36       local found_minimal_primer = true
-   540       while primers.santa_lucia(minimal_primer, options.primer_concentration, options.salt_concentration, options.magnesium_concentration) < target_tm do
-   236          local base_idx = #primer_list[idx] - (pcr.minimal_primer_length + additional_nucleotides)
-   236          if base_idx == 0 then
+   756       while primers.santa_lucia(minimal_primer, options.primer_concentration, options.salt_concentration, options.magnesium_concentration) < target_tm do
+   344          local base_idx = #primer_list[idx] - (pcr.minimal_primer_length + additional_nucleotides)
+   344          if base_idx == 0 then
      2             found_minimal_primer = false
      2             break
                 end
-   468          minimal_primer = primer_list[idx]:sub(base_idx, -1)
-   234          additional_nucleotides = additional_nucleotides + 1
+   684          minimal_primer = primer_list[idx]:sub(base_idx, -1)
+   342          additional_nucleotides = additional_nucleotides + 1
              end
     36       if found_minimal_primer then
     34          minimal_primer_binds[idx] = minimal_primer
@@ -1522,6 +1519,10 @@ test/synbio/pcr.lua
      2          minimal_primer_binds[idx] = ""
              end
           end
+
+
+
+
 
 
           local function generate_pcr_fragments(s, f, r, forward_primer_indexes, reverse_primer_indexes)
@@ -1539,8 +1540,8 @@ test/synbio/pcr.lua
           end
 
 
-
     12    local pcr_fragments = {}
+
 
     36    for _, template_record in ipairs(templates) do
     12       local template = template_record.sequence:upper()
@@ -1629,6 +1630,8 @@ test/synbio/pcr.lua
                 end
              end
           end
+
+
     12    local fragment_set = {}
     42    for _, fragment in ipairs(pcr_fragments) do
     18       fragment_set[fragment] = true
@@ -1732,41 +1735,41 @@ test/synbio/primers.lua
 
      2 function primers.santa_lucia(sequence, primer_concentration, salt_concentration, magnesium_concentration)
 
-   319    local melting_temperature = 0
-   319    local dH = 0
-   319    local dS = 0
+   439    local melting_temperature = 0
+   439    local dH = 0
+   439    local dS = 0
 
-   638    sequence = sequence:upper()
-   319    sequence = sequence:gsub("[^ATGC]", "")
-   319    local gas_constant = 1.9872
-   319    local symmetry_factor = 4
+   878    sequence = sequence:upper()
+   439    sequence = sequence:gsub("[^ATGC]", "")
+   439    local gas_constant = 1.9872
+   439    local symmetry_factor = 4
 
 
-   319    dH = dH + primers.initial_thermodynamic_penalty.h
-   319    dS = dS + primers.initial_thermodynamic_penalty.s
+   439    dH = dH + primers.initial_thermodynamic_penalty.h
+   439    dS = dS + primers.initial_thermodynamic_penalty.s
 
-   638    if sequence == complement.reverse_complement(sequence) then
+   878    if sequence == complement.reverse_complement(sequence) then
      1       dH = dH + primers.symmetry_thermodynamic_penalty.h
      1       dS = dS + primers.symmetry_thermodynamic_penalty.s
      1       symmetry_factor = 1
           end
 
-   907    if sequence:sub(-1, -1) == "A" or sequence:sub(-1, -1) == "T" then
-    74       dH = dH + primers.terminal_at_thermodynamic_penalty.h
-    74       dS = dS + primers.terminal_at_thermodynamic_penalty.s
+  1254    if sequence:sub(-1, -1) == "A" or sequence:sub(-1, -1) == "T" then
+    94       dH = dH + primers.terminal_at_thermodynamic_penalty.h
+    94       dS = dS + primers.terminal_at_thermodynamic_penalty.s
           end
 
-   319    local salt_effect = salt_concentration + (magnesium_concentration * 140)
-   638    dS = dS + ((0.368 * (sequence:len() - 1)) * math.log(salt_effect))
+   439    local salt_effect = salt_concentration + (magnesium_concentration * 140)
+   878    dS = dS + ((0.368 * (sequence:len() - 1)) * math.log(salt_effect))
 
-  6733    for i = 1, sequence:len() - 1, 1 do
- 12190       local dT = primers.nearest_neighbors_thermodynamics[sequence:sub(i, i + 1)]
-  6095       dH = dH + dT.h
-  6095       dS = dS + dT.s
+  8527    for i = 1, sequence:len() - 1, 1 do
+ 15298       local dT = primers.nearest_neighbors_thermodynamics[sequence:sub(i, i + 1)]
+  7649       dH = dH + dT.h
+  7649       dS = dS + dT.s
           end
 
-   319    melting_temperature = dH * 1000 / (dS + gas_constant * math.log(primer_concentration / symmetry_factor)) - 273.15
-   319    return melting_temperature
+   439    melting_temperature = dH * 1000 / (dS + gas_constant * math.log(primer_concentration / symmetry_factor)) - 273.15
+   439    return melting_temperature
        end
 
 

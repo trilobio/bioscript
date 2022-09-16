@@ -28,10 +28,6 @@ simulating PCR reactions have to take this into account.
 
 Wikipedia has a more detailed entry on PCR:
 https://en.wikipedia.org/wiki/Polymerase_chain_reaction
-
-
-
-
 ]]-----------------------------------------------------------------------------
 local primers = require("primers")
 local complement = require("complement")
@@ -53,7 +49,8 @@ local record pcr
   simulate: function({Template}, {string}, number): {string}
 end
 
-pcr.minimal_primer_length = 15
+--- pcr.minimal_primer_length is a reasonable default for primer lengths.
+pcr.minimal_primer_length = 12
 
 --- pcr.design_primers_with_overhang designs PCR primers containing overhangs
 -- on either side. These overhangs are important when designing PCRs whose
@@ -134,7 +131,11 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
     end
   end
   
-  -- Add generate_pcr_fragments
+  -- Add generate_pcr_fragments function. Once the heavy lifting of finding
+  -- primer binding locations is completed, this function takes over. It only
+  -- requires indexes that bind, as well as a primer table of primers that bind
+  -- at those particular indexes. This integer data is used to generate a
+  -- series of new PCR fragments.
   local function generate_pcr_fragments(s: string, f: integer, r: integer, forward_primer_indexes: {integer}, reverse_primer_indexes: {integer}): {string}
     local gen_pcr_fragments: {string} = {}
     for _, forward_primer_index in ipairs(forward_primer_indexes) do
@@ -149,10 +150,10 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
     return gen_pcr_fragments
   end
 
-
   -- Add output pcr_fragments
   local pcr_fragments: {string} = {}
 
+  -- Simulate generation of fragments with every template in this PCR reaction.
   for _, template_record in ipairs(templates) do
     local template = template_record.sequence:upper()
     -- If the template is circular, append it to itself to simulate circularity
@@ -240,6 +241,8 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
       end
     end
   end
+
+  -- Only return unique fragments
   local fragment_set: {string: boolean} = {}
   for _, fragment in ipairs(pcr_fragments) do
     fragment_set[fragment] = true
