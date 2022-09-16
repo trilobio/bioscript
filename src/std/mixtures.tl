@@ -81,6 +81,12 @@ local record mixtures
   environmentals: {string: Environmental}
   common_reagents: {string: Mixture}
 
+  record ChemicalData
+    pka: number
+    density: number
+  end
+  chemical_data: {string: ChemicalData}
+
   amino_acid_weights: {string: number}
   nucleotide_weights: {string: number}
 
@@ -333,6 +339,7 @@ local chemicals: {string: mixtures.Chemical} = {
     -- H2O is special because it contributes to calculated volume
     H2O = {inchi = "InChI=1S/H2O/h1H2"},
     glycerol = {inchi = "InChI=1S/C3H8O3/c4-1-3(6)2-5/h3-6H,1-2H2"},
+    sds = {inchi = "InChI=1S/C12H26O4S.Na/c1-2-3-4-5-6-7-8-9-10-11-12-16-17(13,14)15;/h2-12H2,1H3,(H,13,14,15);/q;+1/p-1"},
 
     biotin = {inchi = "InChI=1S/C10H16N2O3S/c13-8(14)4-2-1-3-7-9-6(5-16-7)11-10(15)12-9/h6-7,9H,1-5H2,(H,13,14)(H2,11,12,15)/t6-,7-,9-/m0/s1"},
     bromophenol_blue = {inchi = "InChI=1S/C19H10Br4O5S/c20-12-5-9(6-13(21)17(12)24)19(10-7-14(22)18(25)15(23)8-10)11-3-1-2-4-16(11)29(26,27)28-19/h1-8,24-25H"},
@@ -353,7 +360,6 @@ local chemicals: {string: mixtures.Chemical} = {
     NaCl = {inchi = "InChI=1S/ClH.Na/h1H;/q;+1/p-1"},
     NH4Cl = {inchi = "InChI=1S/ClH.H3N/h1H;1H3"},
     thiamin = {inchi = "InChI=1S/C12H17N4OS/c1-8-11(3-4-17)18-7-16(8)6-10-5-14-9(2)15-12(10)13/h5,7,17H,3-4,6H2,1-2H3,(H2,13,14,15)/q+1"}, -- heat sensitive
-    sds = {inchi = "InChI=1S/C12H26O4S.Na/c1-2-3-4-5-6-7-8-9-10-11-12-16-17(13,14)15;/h2-12H2,1H3,(H,13,14,15);/q;+1/p-1"},
     ZnCl2 = {inchi = "InChI=1S/2ClH.Zn/h2*1H;/q;;+2/p-2"},
 
     -- Buffers
@@ -386,11 +392,62 @@ local chemicals: {string: mixtures.Chemical} = {
 }
 
 -- g/cm3
-local density: {string: number} = {
-  chemicals.H2O.inchi = 0.9950 -- https://pubchem.ncbi.nlm.nih.gov/compound/Water#section=Density
-  chemicals.glycerol.inchi = 1.2613 -- https://pubchem.ncbi.nlm.nih.gov/compound/Glycerol#section=Density
-  chemicals.sds.inchi = 1.1 -- https://pubchem.ncbi.nlm.nih.gov/compound/3423265#section=Density
+local chemical_data: {string: mixtures.ChemicalData} = {
+  [chemicals.H2O.inchi] = {pka = 14.0, density = 0.9950}, -- https://pubchem.ncbi.nlm.nih.gov/compound/Water#section=Density https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_(Organic_Chemistry)/Fundamentals/What_is_the_pKa_of_water
+  [chemicals.glycerol.inchi] = {pka = 14.4, density = 1.2613}, -- https://pubchem.ncbi.nlm.nih.gov/compound/Glycerol#section=Density https://pubchem.ncbi.nlm.nih.gov/compound/Glycerol#section=Refractive-Index
+  [chemicals.sds.inchi] = {density = 1.1}, -- https://pubchem.ncbi.nlm.nih.gov/compound/3423265#section=Density
+
+  [chemicals.biotin.inchi] = {pka = 0},
+  [chemicals.bromophenol_blue.inchi] = {pka = 0},
+  [chemicals.C2H3O2K.inchi] = {pka = 0},
+  [chemicals.CaCl2.inchi] = {pka = 0},
+  [chemicals.CoCl2.inchi] = {pka = 0},
+  [chemicals.CuCl2.inchi] = {pka = 0},
+  [chemicals.dithiothreitol.inchi] = {pka = 0},
+  [chemicals.EDTA.inchi] = {pka = 0},
+  [chemicals.FeCl3.inchi] = {pka = 0},
+  [chemicals.glucose.inchi] = {pka = 0},
+  [chemicals.H3BO3.inchi] = {pka = 0},
+  [chemicals.KH2PO4.inchi] = {pka = 0},
+  [chemicals.MgSO4.inchi] = {pka = 0},
+  [chemicals.MgCl2.inchi] = {pka = 0},
+  [chemicals.MnCl2.inchi] = {pka = 0},
+  [chemicals.Na2HPO4.inchi] = {pka = 0},
+  [chemicals.NaCl.inchi] = {pka = 0},
+  [chemicals.NH4Cl.inchi] = {pka = 0},
+  [chemicals.thiamin.inchi] = {pka = 0},
+  [chemicals.sds.inchi] = {pka = 0},
+  [chemicals.ZnCl2.inchi] = {pka = 0},
+
+  [chemicals.tris_HCl.inchi] = {pka = 0},
+  [chemicals.bis_tris_propane_HCl.inchi] = {pka = 0},
+
+  [chemicals.alanine.inchi] = {pka = 0},
+  [chemicals.arginine.inchi] = {pka = 0},
+  [chemicals.asparagine.inchi] = {pka = 0},
+  [chemicals.aspartic_acid.inchi] = {pka = 0},
+  [chemicals.cysteine.inchi] = {pka = 0},
+  [chemicals.glutamine.inchi] = {pka = 0},
+  [chemicals.glutamic_acid.inchi] = {pka = 0},
+  [chemicals.glycine.inchi] = {pka = 0},
+  [chemicals.histidine.inchi] = {pka = 0},
+  [chemicals.isoleucine.inchi] = {pka = 0},
+  [chemicals.leucine.inchi] = {pka = 0},
+  [chemicals.lysine.inchi] = {pka = 0},
+  [chemicals.methionine.inchi] = {pka = 0},
+  [chemicals.phenylalanine.inchi] = {pka = 0},
+  [chemicals.proline.inchi] = {pka = 0},
+  [chemicals.serine.inchi] = {pka = 0},
+  [chemicals.threonine.inchi] = {pka = 0},
+  [chemicals.tryptophan.inchi] = {pka = 0},
+  [chemicals.tyrosine.inchi] = {pka = 0},
+  [chemicals.valine.inchi] = {pka = 0},
+  [chemicals.selenocysteine.inchi] = {pka = 0},
+  [chemicals.pyrrolysine.inchi] = {pka = 0},
+
 }
+
+mixtures.chemical_data = chemical_data
 
 local function formula(self: mixtures.Chemical): string
   return self.inchi:match("/(.-)/")
