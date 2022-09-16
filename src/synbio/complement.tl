@@ -38,6 +38,9 @@ N (any): A, T, G, C
 W (weak): A, T
 S (strong): G, C
 
+This particular module implements a single function to get the reverse
+complement of a DNA sequence.
+
 References:
 [1] https://en.wikipedia.org/wiki/DNA
 [2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
@@ -78,6 +81,7 @@ end
 -- @return the reverse complement
 -- @usage local s = complement.reverse_complement("ATGC")
 function complement.reverse_complement(sequence: string): string
+  sequence = sequence:upper()
 	local s: string = ""
 	for i = 1, #sequence do
     local base = sequence:sub(i,i)
