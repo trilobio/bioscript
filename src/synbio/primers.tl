@@ -30,6 +30,10 @@ local record primers
 	-- melting_temp calls SantaLucia with default inputs for primer and salt
 	-- concentration.
 	melting_temp: function(string): number
+
+  default_primer_concentration: number
+  default_salt_concentration: number
+  default_magnesium_concentration: number
 end
 
 primers.nearest_neighbors_thermodynamics = {
@@ -113,14 +117,15 @@ function primers.marmur_doty(sequence: string): number
 	return 2*(a_count+t_count) + 4*(g_count+c_count) - 7.0
 end
 
+primers.default_primer_concentration = 0.000000500 -- 500e-9, 500 nM (nanomolar) primer concentration
+primers.default_salt_concentration = 0.050 -- 50e-3, 50 mM (millimolar) sodium concentration
+primers.default_magnesium_concentration = 0.0 -- 0 mM (millimolar) magnesium concentration
+
 --- Returns the melting temperature using Santa Lucia with reasonable defaults
 -- @param sequence the primer sequence
 -- @return melting temperature
 -- @usage local melting_temperature = primers.melting_temp("ACGTCCGGACTT")
 function primers.melting_temp(sequence: string): number
-	local primer_concentration = 0.000000500 -- 500e-9, 500 nM (nanomolar) primer concentration
-	local salt_concentration = 0.050 -- 50e-3, 50 mM (millimolar) sodium concentration
-	local magnesium_concentration = 0.0 -- 0 mM (millimolar) magnesium concentration
-	return primers.santa_lucia(sequence, primer_concentration, salt_concentration, magnesium_concentration)
+	return primers.santa_lucia(sequence, primers.default_primer_concentration, primers.default_salt_concentration, primers.default_magnesium_concentration)
 end
 return primers
