@@ -43,7 +43,7 @@ describe("pcr", function()
     it("should simulate concatemerization", function()
       local forward_primer = "AATAATTACACCGAGATAACACATCATGG"
       local reverse_primer = "CCATGATGTGTTATCTCGGTGTAATTATTTTAAGAAAGCGCATTTTCCAGC"
-      assert.has_error(function() pcr.simulate({{sequence = gene, circular = false}}, {forward_primer, reverse_primer}, 55.0) end, "Concatemerization detected in PCR.", "should call error when concatemerizing")
+      assert.has_error(function() pcr.simulate({{sequence = gene, circular = false}}, {forward_primer, reverse_primer}, 55.0) end, "concatemerization detected in PCR.", "should call error when concatemerizing")
     end)
 
     it("should get ending PCRs", function()
