@@ -2699,6 +2699,189 @@ util.uuid = function()
 end
 
 
+local inventory = {Sample = {}, Tube = {}, Plate = {}, }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inventory.new_sample = function(mixture)
+   return { id = util.uuid(), mixture = mixture }
+end
+
+inventory.new_tube = function(name, mixture, datamatrix, capped)
+   local new_tube = {}
+   new_tube.id = util.uuid()
+   new_tube.name = name
+   new_tube.sample = inventory.new_sample(mixture)
+   new_tube.datamatrix = datamatrix
+   new_tube.capped = capped
+   return new_tube
+end
+
+local function add_tube(plate, tube, address)
+   tube.address = address
+   plate.tubes[#plate.tubes + 1] = tube
+   return plate
+end
+
+inventory.new_plate = function(name, labware)
+   local new_plate = {}
+   new_plate.id = util.uuid()
+   new_plate.name = name
+   new_plate.labware = labware
+   new_plate.tubes = {}
+   new_plate.add_tube = add_tube
+   return new_plate
+end
+
+
 
 
 
@@ -2750,11 +2933,13 @@ local std = {}
 
 
 
+
 std.atoms = atoms
 std.conversions = conversions
 std.mixtures = mixtures
 std.util = util
 std.biologic_commands = biologic_commands
+std.inventory = inventory
 std.synbio = synbio
 
 return std
