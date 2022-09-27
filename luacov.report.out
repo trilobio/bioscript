@@ -391,35 +391,31 @@ test/std/inventory.lua
 
 
 
+     1 plate = {}
 
        inventory.new_sample = function(mixture)
      4    return { id = util.uuid(), mixture = mixture }
        end
 
-       inventory.new_tube = function(name, mixture, datamatrix, capped)
+       inventory.new_tube = function(name, address, mixture, datamatrix, capped)
      2    local new_tube = {}
      4    new_tube.id = util.uuid()
      2    new_tube.name = name
      4    new_tube.sample = inventory.new_sample(mixture)
      2    new_tube.datamatrix = datamatrix
      2    new_tube.capped = capped
+     2    new_tube.address = address
+     2    plate.tubes[#plate.tubes + 1] = new_tube
      2    return new_tube
        end
 
-       local function add_tube(plate, tube, address)
-     2    tube.address = address
-     2    plate.tubes[#plate.tubes + 1] = tube
-     2    return plate
-       end
-
        inventory.new_plate = function(name, labware)
-     1    local new_plate = {}
-     2    new_plate.id = util.uuid()
-     1    new_plate.name = name
-     1    new_plate.labware = labware
-     1    new_plate.tubes = {}
-     1    new_plate.add_tube = add_tube
-     1    return new_plate
+     1    plate = {}
+     2    plate.id = util.uuid()
+     1    plate.name = name
+     1    plate.labware = labware
+     1    plate.tubes = {}
+     1    return plate
        end
 
      1 return inventory
@@ -1028,8 +1024,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   125 for k, v in pairs(complement.COMPLEMENTS) do
-   360    complement.COMPLEMENTS[k:lower()] = v:lower()
+   100 for k, v in pairs(complement.COMPLEMENTS) do
+   285    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -2768,7 +2764,7 @@ File                       Hits Missed Coverage
 -----------------------------------------------
 test/std/atoms.lua         27   0      100.00%
 test/std/conversions.lua   22   0      100.00%
-test/std/inventory.lua     22   0      100.00%
+test/std/inventory.lua     21   0      100.00%
 test/std/mixtures.lua      194  58     76.98%
 test/std/util.lua          7    0      100.00%
 test/synbio/complement.lua 15   0      100.00%
@@ -2780,4 +2776,4 @@ test/synbio/json.lua       187  9      95.41%
 test/synbio/pcr.lua        127  0      100.00%
 test/synbio/primers.lua    62   0      100.00%
 -----------------------------------------------
-Total                      1010 154    86.77%
+Total                      1009 154    86.76%

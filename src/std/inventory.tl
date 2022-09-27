@@ -16,14 +16,13 @@ local record inventory
     capped: boolean
     sample: Sample
   end
-  new_tube: function(string, mixtures.Mixture, string, boolean): Tube
+  new_tube: function(string, integer, mixtures.Mixture, string, boolean): Tube
+  add_tube: function(Tube, integer): Plate
   record Plate
     id: string
     name: string
     labware: Labware
     tubes: {Tube}
-    add_tube: function(Plate, Tube, integer): Plate
-    to_json: function(Plate): string
   end
   new_plate: function(string, Labware): Plate
 
@@ -153,34 +152,31 @@ local record inventory
   end
 end
 
+global plate: inventory.Plate = {}
+
 inventory.new_sample = function(mixture: mixtures.Mixture): inventory.Sample
   return {id = util.uuid(), mixture = mixture} as inventory.Sample
 end
 
-inventory.new_tube = function(name: string, mixture: mixtures.Mixture, datamatrix: string, capped: boolean): inventory.Tube
+inventory.new_tube = function(name: string, address: integer, mixture: mixtures.Mixture, datamatrix: string, capped: boolean): inventory.Tube
   local new_tube: inventory.Tube = {}
   new_tube.id = util.uuid()
   new_tube.name = name
   new_tube.sample = inventory.new_sample(mixture)
   new_tube.datamatrix = datamatrix
   new_tube.capped = capped
+  new_tube.address = address
+  plate.tubes[#plate.tubes+1] = new_tube
   return new_tube
 end
 
-local function add_tube(plate: inventory.Plate, tube: inventory.Tube, address: integer): inventory.Plate
-  tube.address = address
-  plate.tubes[#plate.tubes+1] = tube
-  return plate
-end
-
 inventory.new_plate = function(name: string, labware: inventory.Labware): inventory.Plate
-  local new_plate: inventory.Plate = {}
-  new_plate.id = util.uuid()
-  new_plate.name = name
-  new_plate.labware = labware
-  new_plate.tubes = {}
-  new_plate.add_tube = add_tube
-  return new_plate
+  global plate: inventory.Plate = {}
+  plate.id = util.uuid()
+  plate.name = name
+  plate.labware = labware
+  plate.tubes = {}
+  return plate
 end
 
 return inventory

@@ -1,96 +1,3 @@
---[[---------------------------------------------------------------------------
-The complement module provides functions for getting the reverse complement
-of a given DNA sequence.
-
-DNA, as a double helix, contains two strands of single-stranded DNA bonded to
-each other through hydrogren bonds on each strand's base pairs. In DNA, adenine
-has two hydrogen bonds with the other stand's complementing thymine. Guanine,
-on the other hand, has three hydrogen bonds with the other strand's
-complementing cytosine[1].
-
-A: Adenine
-T: Thymine
-G: Guanine
-C: Cytosine
-
-Each DNA strand has a certain direction (known as the 3prime or 5prime end,
-usually written as 3' or 5')[2]. These directions have important biological
-consequences: DNA polymerase can only synthesize DNA in the 5' to 3' direction,
-while oligos can only be chemically synthesized in the 3' to 5' direction. The
-double helix's complementing DNA strands run in opposite directions to each
-other. For example, look at the following DNA sequence:
-
-5' A T G C 3'
-3' T A C G 5'
-
-DNA, when read as a string on a computer, is always in the 5' to 3' direction.
-That means the two strands producing the above DNA sequence are "ATGC" and
-"GCAT". When a function makes a "reverse complement" of a strand, it means
-converting from an input of ATGC to an output of GCAT. Reverse complementing
-is important in simulating how enzymes and other strands will interact with
-a DNA strand of interest.
-
-Finally, there are certain occassions where we need have "degenerate" base
-pairs, which are string representations of different possible base pairs[3].
-There are many of them, but the most common are:
-
-N (any): A, T, G, C
-W (weak): A, T
-S (strong): G, C
-
-This particular module implements a single function to get the reverse
-complement of a DNA sequence.
-
-References:
-[1] https://en.wikipedia.org/wiki/DNA
-[2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
-[3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
-
-]]-----------------------------------------------------------------------------
-local record complement
-	COMPLEMENTS: {string:string}
-  reverse_complement: function(string): string
-end
-
---- complement.COMPLEMENTS are DNA base complements.
--- @table COMPLEMENTS
-complement.COMPLEMENTS = {
-	A = "T",
-	B = "V",
-	C = "G",
-	D = "H",
-	G = "C",
-	H = "D",
-	K = "M",
-	M = "K",
-	N = "N",
-	R = "Y",
-	S = "S",
-	T = "A",
-	U = "A",
-	V = "B",
-	W = "W",
-	Y = "R",
-}
-for k, v in pairs(complement.COMPLEMENTS) do
-	complement.COMPLEMENTS[k:lower()] = v:lower()
-end
-
---- Returns reverse complement of a sequence, returns empty string if unknown character.
--- @param sequence the sequence to reverse complement
--- @return the reverse complement
--- @usage local s = complement.reverse_complement("ATGC")
-function complement.reverse_complement(sequence: string): string
-  sequence = sequence:upper()
-	local s: string = ""
-	for i = 1, #sequence do
-    local base = sequence:sub(i,i)
-		if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
-		s = s .. complement.COMPLEMENTS[base]
-	end
-	return s:reverse()
-end
-
 local record json
 	decode: function(string): any
 	encode: function(any): string
@@ -180,7 +87,7 @@ local function encode_number(val:number): string
   if val ~= val or val <= -math.huge or val >= math.huge then
     error("unexpected number value '" .. tostring(val) .. "'")
   end
-  return string.format("%.14g", val)
+  return string.format("%.18g", val) -- 53 bit significand precision gives 15-17 significant digits. We do 18 to be safe.
 end
 
 
@@ -449,6 +356,99 @@ function json.decode(str: string): table
     decode_error(str, idx, "trailing garbage")
   end
   return res
+end
+
+--[[---------------------------------------------------------------------------
+The complement module provides functions for getting the reverse complement
+of a given DNA sequence.
+
+DNA, as a double helix, contains two strands of single-stranded DNA bonded to
+each other through hydrogren bonds on each strand's base pairs. In DNA, adenine
+has two hydrogen bonds with the other stand's complementing thymine. Guanine,
+on the other hand, has three hydrogen bonds with the other strand's
+complementing cytosine[1].
+
+A: Adenine
+T: Thymine
+G: Guanine
+C: Cytosine
+
+Each DNA strand has a certain direction (known as the 3prime or 5prime end,
+usually written as 3' or 5')[2]. These directions have important biological
+consequences: DNA polymerase can only synthesize DNA in the 5' to 3' direction,
+while oligos can only be chemically synthesized in the 3' to 5' direction. The
+double helix's complementing DNA strands run in opposite directions to each
+other. For example, look at the following DNA sequence:
+
+5' A T G C 3'
+3' T A C G 5'
+
+DNA, when read as a string on a computer, is always in the 5' to 3' direction.
+That means the two strands producing the above DNA sequence are "ATGC" and
+"GCAT". When a function makes a "reverse complement" of a strand, it means
+converting from an input of ATGC to an output of GCAT. Reverse complementing
+is important in simulating how enzymes and other strands will interact with
+a DNA strand of interest.
+
+Finally, there are certain occassions where we need have "degenerate" base
+pairs, which are string representations of different possible base pairs[3].
+There are many of them, but the most common are:
+
+N (any): A, T, G, C
+W (weak): A, T
+S (strong): G, C
+
+This particular module implements a single function to get the reverse
+complement of a DNA sequence.
+
+References:
+[1] https://en.wikipedia.org/wiki/DNA
+[2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
+[3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
+
+]]-----------------------------------------------------------------------------
+local record complement
+	COMPLEMENTS: {string:string}
+  reverse_complement: function(string): string
+end
+
+--- complement.COMPLEMENTS are DNA base complements.
+-- @table COMPLEMENTS
+complement.COMPLEMENTS = {
+	A = "T",
+	B = "V",
+	C = "G",
+	D = "H",
+	G = "C",
+	H = "D",
+	K = "M",
+	M = "K",
+	N = "N",
+	R = "Y",
+	S = "S",
+	T = "A",
+	U = "A",
+	V = "B",
+	W = "W",
+	Y = "R",
+}
+for k, v in pairs(complement.COMPLEMENTS) do
+	complement.COMPLEMENTS[k:lower()] = v:lower()
+end
+
+--- Returns reverse complement of a sequence, returns empty string if unknown character.
+-- @param sequence the sequence to reverse complement
+-- @return the reverse complement
+-- @usage local s = complement.reverse_complement("ATGC")
+function complement.reverse_complement(sequence: string): string
+  sequence = sequence:upper()
+	local s: string = ""
+	for i = 1, #sequence do
+    local base = sequence:sub(i,i)
+		if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+		s = s .. complement.COMPLEMENTS[base]
+	end
+	return s:reverse()
 end
 
 --[[---------------------------------------------------------------------------
@@ -2714,14 +2714,13 @@ local record inventory
     capped: boolean
     sample: Sample
   end
-  new_tube: function(string, mixtures.Mixture, string, boolean): Tube
+  new_tube: function(string, integer, mixtures.Mixture, string, boolean): Tube
+  add_tube: function(Tube, integer): Plate
   record Plate
     id: string
     name: string
     labware: Labware
     tubes: {Tube}
-    add_tube: function(Plate, Tube, integer): Plate
-    to_json: function(Plate): string
   end
   new_plate: function(string, Labware): Plate
 
@@ -2851,34 +2850,31 @@ local record inventory
   end
 end
 
+global plate: inventory.Plate = {}
+
 inventory.new_sample = function(mixture: mixtures.Mixture): inventory.Sample
   return {id = util.uuid(), mixture = mixture} as inventory.Sample
 end
 
-inventory.new_tube = function(name: string, mixture: mixtures.Mixture, datamatrix: string, capped: boolean): inventory.Tube
+inventory.new_tube = function(name: string, address: integer, mixture: mixtures.Mixture, datamatrix: string, capped: boolean): inventory.Tube
   local new_tube: inventory.Tube = {}
   new_tube.id = util.uuid()
   new_tube.name = name
   new_tube.sample = inventory.new_sample(mixture)
   new_tube.datamatrix = datamatrix
   new_tube.capped = capped
+  new_tube.address = address
+  plate.tubes[#plate.tubes+1] = new_tube
   return new_tube
 end
 
-local function add_tube(plate: inventory.Plate, tube: inventory.Tube, address: integer): inventory.Plate
-  tube.address = address
-  plate.tubes[#plate.tubes+1] = tube
-  return plate
-end
-
 inventory.new_plate = function(name: string, labware: inventory.Labware): inventory.Plate
-  local new_plate: inventory.Plate = {}
-  new_plate.id = util.uuid()
-  new_plate.name = name
-  new_plate.labware = labware
-  new_plate.tubes = {}
-  new_plate.add_tube = add_tube
-  return new_plate
+  global plate: inventory.Plate = {}
+  plate.id = util.uuid()
+  plate.name = name
+  plate.labware = labware
+  plate.tubes = {}
+  return plate
 end
 
 
@@ -2931,6 +2927,7 @@ local record std
   util: util
   biologic_commands: biologic_commands
   inventory: inventory
+  json: json
   synbio: synbio
 end
 
@@ -2940,6 +2937,7 @@ std.mixtures = mixtures
 std.util = util
 std.biologic_commands = biologic_commands
 std.inventory = inventory
+std.json = json
 std.synbio = synbio
 
 return std

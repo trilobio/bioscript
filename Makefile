@@ -10,8 +10,8 @@ test:
 
 build:
 	@mkdir build ;\
+	sed '$$d' src/std/json.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/complement.tl >> tmp.tl ;\
-	sed '$$d' src/synbio/json.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/fasta.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/fastq.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/primers.tl >> tmp.tl ;\

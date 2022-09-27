@@ -1,97 +1,4 @@
-local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; local pairs = _tl_compat and _tl_compat.pairs or pairs; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local complement = {}
-
-
-
-
-
-
-complement.COMPLEMENTS = {
-   A = "T",
-   B = "V",
-   C = "G",
-   D = "H",
-   G = "C",
-   H = "D",
-   K = "M",
-   M = "K",
-   N = "N",
-   R = "Y",
-   S = "S",
-   T = "A",
-   U = "A",
-   V = "B",
-   W = "W",
-   Y = "R",
-}
-for k, v in pairs(complement.COMPLEMENTS) do
-   complement.COMPLEMENTS[k:lower()] = v:lower()
-end
-
-
-
-
-
-function complement.reverse_complement(sequence)
-   sequence = sequence:upper()
-   local s = ""
-   for i = 1, #sequence do
-      local base = sequence:sub(i, i)
-      if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
-      s = s .. complement.COMPLEMENTS[base]
-   end
-   return s:reverse()
-end
-
-local json = {}
+local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; local pairs = _tl_compat and _tl_compat.pairs or pairs; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table; local json = {}
 
 
 
@@ -180,7 +87,7 @@ local function encode_number(val)
    if val ~= val or val <= -math.huge or val >= math.huge then
       error("unexpected number value '" .. tostring(val) .. "'")
    end
-   return string.format("%.14g", val)
+   return string.format("%.18g", val)
 end
 
 
@@ -449,6 +356,99 @@ function json.decode(str)
       decode_error(str, idx, "trailing garbage")
    end
    return res
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local complement = {}
+
+
+
+
+
+
+complement.COMPLEMENTS = {
+   A = "T",
+   B = "V",
+   C = "G",
+   D = "H",
+   G = "C",
+   H = "D",
+   K = "M",
+   M = "K",
+   N = "N",
+   R = "Y",
+   S = "S",
+   T = "A",
+   U = "A",
+   V = "B",
+   W = "W",
+   Y = "R",
+}
+for k, v in pairs(complement.COMPLEMENTS) do
+   complement.COMPLEMENTS[k:lower()] = v:lower()
+end
+
+
+
+
+
+function complement.reverse_complement(sequence)
+   sequence = sequence:upper()
+   local s = ""
+   for i = 1, #sequence do
+      local base = sequence:sub(i, i)
+      if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+      s = s .. complement.COMPLEMENTS[base]
+   end
+   return s:reverse()
 end
 
 
@@ -2850,35 +2850,31 @@ local inventory = {Sample = {}, Tube = {}, Plate = {}, }
 
 
 
+plate = {}
 
 inventory.new_sample = function(mixture)
    return { id = util.uuid(), mixture = mixture }
 end
 
-inventory.new_tube = function(name, mixture, datamatrix, capped)
+inventory.new_tube = function(name, address, mixture, datamatrix, capped)
    local new_tube = {}
    new_tube.id = util.uuid()
    new_tube.name = name
    new_tube.sample = inventory.new_sample(mixture)
    new_tube.datamatrix = datamatrix
    new_tube.capped = capped
+   new_tube.address = address
+   plate.tubes[#plate.tubes + 1] = new_tube
    return new_tube
 end
 
-local function add_tube(plate, tube, address)
-   tube.address = address
-   plate.tubes[#plate.tubes + 1] = tube
-   return plate
-end
-
 inventory.new_plate = function(name, labware)
-   local new_plate = {}
-   new_plate.id = util.uuid()
-   new_plate.name = name
-   new_plate.labware = labware
-   new_plate.tubes = {}
-   new_plate.add_tube = add_tube
-   return new_plate
+   plate = {}
+   plate.id = util.uuid()
+   plate.name = name
+   plate.labware = labware
+   plate.tubes = {}
+   return plate
 end
 
 
@@ -2934,12 +2930,14 @@ local std = {}
 
 
 
+
 std.atoms = atoms
 std.conversions = conversions
 std.mixtures = mixtures
 std.util = util
 std.biologic_commands = biologic_commands
 std.inventory = inventory
+std.json = json
 std.synbio = synbio
 
 return std
