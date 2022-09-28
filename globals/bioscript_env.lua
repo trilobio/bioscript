@@ -1,8 +1,11 @@
 local std_func = function() REPLACE_ME end
 local std = std_func()
 
+_G.encode = std.json.encode
+
 _G.new_tube = std.inventory.new_tube
 _G.new_plate = std.inventory.new_plate
+_G.new_tipbox = std.inventory.new_tipbox
 
 _G.chemicals = std.mixtures.chemicals
 _G.sequences = std.mixtures.chemicals
@@ -29,4 +32,5 @@ _G.ng = std.conversions.ng
 _G.pg = std.conversions.pg
 _G.fg = std.conversions.fg
 
-_G.encode = std.json.encode
+_G.new_protocol = std.biologic_commands.new_protocol
+_G.mix = std.biologic_commands.mix

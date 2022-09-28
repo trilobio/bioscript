@@ -2723,6 +2723,10 @@ local record inventory
     tubes: {Tube}
   end
   new_plate: function(string, Labware): Plate
+  new_tipbox: function(Labware): Plate
+
+  address_to_integer: {string: integer}
+  integer_to_address: {integer: string}
 
   enum Labware
     "agilent_1_reservoir_290ml"
@@ -2877,6 +2881,22 @@ inventory.new_plate = function(name: string, labware: inventory.Labware): invent
   return plate
 end
 
+inventory.new_tipbox = function(labware: inventory.Labware): inventory.Plate
+  global plate: inventory.Plate = {}
+  plate.id = util.uuid()
+  plate.name = labware
+  plate.labware = labware
+  plate.tubes = {}
+  for i=1,96 do
+    local new_tube: inventory.Tube = {}
+    new_tube.id = util.uuid()
+    new_tube.name = "tip"
+    new_tube.address = i-1
+    plate.tubes[i] = new_tube
+  end
+  return plate
+end
+
 
 --[[---------------------------------------------------------------------------
 
@@ -2887,6 +2907,7 @@ end
 local record biologic_commands
   -- BiologicCommands
   record Mix
+    samples: {inventory.Sample}
     mixture: mixtures.Mixture
   end
   record BiologicCommand
@@ -2897,26 +2918,26 @@ local record biologic_commands
     biologic_commands: {BiologicCommand}
     name: string
     append: function(BiologicCommands, BiologicCommand)
-    to_json: function(BiologicCommands): string
   end
   new_protocol: function(string): BiologicCommands
-  new_mix_command: function(mixtures.Mixture): BiologicCommand
+  mix: function(Mix): BiologicCommand
 
 end
 
+global protocol: biologic_commands.BiologicCommands = {name = "untitled_protocol", biologic_commands = {}}
+
 biologic_commands.new_protocol = function(name: string): biologic_commands.BiologicCommands
-  local protocol: biologic_commands.BiologicCommands = {name = name, biologic_commands = {}}
+  global protocol: biologic_commands.BiologicCommands = {name = name, biologic_commands = {}}
   protocol.append = function(self: biologic_commands.BiologicCommands, command: biologic_commands.BiologicCommand)
     self.biologic_commands[#self.biologic_commands+1] = command
-  end
-  protocol.to_json = function(self:biologic_commands.BiologicCommands): string 
-    return json.encode(self)
   end
   return protocol
 end
 
-biologic_commands.new_mix_command = function(mixture: mixtures.Mixture): biologic_commands.BiologicCommand
-  return {biologic_command_type = 1, mix = {mixture = mixture} as biologic_commands.Mix} as biologic_commands.BiologicCommand
+biologic_commands.mix = function(mix:biologic_commands.Mix): biologic_commands.BiologicCommand
+  local command = {biologic_command_type = 1, mix = mix as biologic_commands.Mix} as biologic_commands.BiologicCommand
+  protocol.biologic_commands[#protocol.biologic_commands+1] = command
+  return command
 end
 
 

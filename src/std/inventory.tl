@@ -25,6 +25,10 @@ local record inventory
     tubes: {Tube}
   end
   new_plate: function(string, Labware): Plate
+  new_tipbox: function(Labware): Plate
+
+  address_to_integer: {string: integer}
+  integer_to_address: {integer: string}
 
   enum Labware
     "agilent_1_reservoir_290ml"
@@ -176,6 +180,22 @@ inventory.new_plate = function(name: string, labware: inventory.Labware): invent
   plate.name = name
   plate.labware = labware
   plate.tubes = {}
+  return plate
+end
+
+inventory.new_tipbox = function(labware: inventory.Labware): inventory.Plate
+  global plate: inventory.Plate = {}
+  plate.id = util.uuid()
+  plate.name = labware
+  plate.labware = labware
+  plate.tubes = {}
+  for i=1,96 do
+    local new_tube: inventory.Tube = {}
+    new_tube.id = util.uuid()
+    new_tube.name = "tip"
+    new_tube.address = i-1
+    plate.tubes[i] = new_tube
+  end
   return plate
 end
 

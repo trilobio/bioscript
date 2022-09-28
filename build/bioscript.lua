@@ -2850,6 +2850,10 @@ local inventory = {Sample = {}, Tube = {}, Plate = {}, }
 
 
 
+
+
+
+
 plate = {}
 
 inventory.new_sample = function(mixture)
@@ -2874,6 +2878,22 @@ inventory.new_plate = function(name, labware)
    plate.name = name
    plate.labware = labware
    plate.tubes = {}
+   return plate
+end
+
+inventory.new_tipbox = function(labware)
+   plate = {}
+   plate.id = util.uuid()
+   plate.name = labware
+   plate.labware = labware
+   plate.tubes = {}
+   for i = 1, 96 do
+      local new_tube = {}
+      new_tube.id = util.uuid()
+      new_tube.name = "tip"
+      new_tube.address = i - 1
+      plate.tubes[i] = new_tube
+   end
    return plate
 end
 
@@ -2904,19 +2924,20 @@ local biologic_commands = {Mix = {}, BiologicCommand = {}, BiologicCommands = {}
 
 
 
+protocol = { name = "untitled_protocol", biologic_commands = {} }
+
 biologic_commands.new_protocol = function(name)
-   local protocol = { name = name, biologic_commands = {} }
+   protocol = { name = name, biologic_commands = {} }
    protocol.append = function(self, command)
       self.biologic_commands[#self.biologic_commands + 1] = command
-   end
-   protocol.to_json = function(self)
-      return json.encode(self)
    end
    return protocol
 end
 
-biologic_commands.new_mix_command = function(mixture)
-   return { biologic_command_type = 1, mix = { mixture = mixture } }
+biologic_commands.mix = function(mix)
+   local command = { biologic_command_type = 1, mix = mix }
+   protocol.biologic_commands[#protocol.biologic_commands + 1] = command
+   return command
 end
 
 
