@@ -75,8 +75,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   100 for k, v in pairs(complement.COMPLEMENTS) do
-   285    complement.COMPLEMENTS[k:lower()] = v:lower()
+   130 for k, v in pairs(complement.COMPLEMENTS) do
+   360    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -107,6 +107,35 @@ test/synbio/fasta.lua
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      1 local fasta = {Fasta = {}, }
 
 
@@ -119,10 +148,12 @@ test/synbio/fasta.lua
 
 
      1 function fasta.parse(input)
+
      1    local output = {}
      1    local identifier = ""
      1    local sequence = ""
      1    local start = true
+
      8    for line in string.gmatch(input, '[^\r\n]+') do
      6       local s = line:sub(1, 1)
 
@@ -132,6 +163,7 @@ test/synbio/fasta.lua
      2             identifier = line:sub(2, -1)
      1             start = false
                 else
+
      1             output[#output + 1] = { identifier = identifier, sequence = sequence }
      1             identifier = ""
      1             sequence = ""
@@ -158,6 +190,33 @@ test/synbio/fastq.lua
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      1 local fastq = {Fastq = {}, }
 
 
@@ -171,12 +230,14 @@ test/synbio/fastq.lua
 
 
      1 function fastq.parse(input)
+
      1    local output = {}
      1    local identifier = ""
      1    local sequence = ""
      1    local quality = ""
      1    local quality_next = false
      1    local start = true
+
     10    for line in string.gmatch(input, '[^\r\n]+') do
      8       local s = line:sub(1, 1)
 
@@ -186,6 +247,7 @@ test/synbio/fastq.lua
      2             identifier = line:sub(2, -1)
      1             start = false
                 else
+
      1             output[#output + 1] = { identifier = identifier, sequence = sequence, quality = quality }
      1             identifier = ""
      1             sequence = ""
@@ -193,15 +255,18 @@ test/synbio/fastq.lua
                 end
 
      6       elseif s ~= "@" then
-     6          if quality_next == true then
-     2             quality = line
-     2             quality_next = false
-                else
+     6          if quality_next == false then
      4             if s == "+" then
+
      2                quality_next = true
                    else
+
      2                sequence = sequence .. line:gsub("%s+", "")
                    end
+                else
+
+     2             quality = line
+     2             quality_next = false
                 end
              end
           end
@@ -558,7 +623,7 @@ test/synbio/genbank.lua
    790       if type(obj) ~= 'table' then return obj end
    147       local obj_table = obj
    147       local res = setmetatable({}, getmetatable(obj))
-  1299       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+  1446       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
    147       return res
           end
 
@@ -1055,7 +1120,7 @@ test/synbio/json.lua
        }
 
      2 local escape_char_map_inv = { ["/"] = "/" }
-    16 for k, v in pairs(escape_char_map) do
+    18 for k, v in pairs(escape_char_map) do
     14    escape_char_map_inv[v] = k
        end
 
@@ -1078,7 +1143,7 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-     9       for k in pairs(val) do
+    12       for k in pairs(val) do
      7          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
@@ -1096,7 +1161,7 @@ test/synbio/json.lua
 
           else
 
-     8       for k, v in pairs(val) do
+    13       for k, v in pairs(val) do
      7          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
@@ -1593,14 +1658,14 @@ test/synbio/pcr.lua
     12       local forward_locations_indexes = {}
     12       local reverse_locations_inverted = {}
     12       local reverse_locations_indexes = {}
-    36       for idx, values in pairs(forward_locations) do
+    48       for idx, values in pairs(forward_locations) do
     72          for _, value in ipairs(values) do
     24             if forward_locations_inverted[value] == nil then forward_locations_inverted[value] = {} end
     24             forward_locations_inverted[value][#forward_locations_inverted[value] + 1] = idx
     24             forward_locations_indexes[#forward_locations_indexes + 1] = value
                 end
              end
-    32       for idx, values in pairs(reverse_locations) do
+    44       for idx, values in pairs(reverse_locations) do
     56          for _, value in ipairs(values) do
     16             if reverse_locations_inverted[value] == nil then reverse_locations_inverted[value] = {} end
     16             reverse_locations_inverted[value][#reverse_locations_inverted[value] + 1] = idx
@@ -1646,7 +1711,7 @@ test/synbio/pcr.lua
     18       fragment_set[fragment] = true
           end
     12    pcr_fragments = {}
-    25    for fragment, _ in pairs(fragment_set) do
+    37    for fragment, _ in pairs(fragment_set) do
     13       pcr_fragments[#pcr_fragments + 1] = fragment
           end
     12    return pcr_fragments
