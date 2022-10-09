@@ -18,5 +18,14 @@ To build from source and run all tests, run:
 make
 ```
 
+## Reading the source
+
+### File formats
+1. src/synbio/fasta.tl
+2. src/synbio/fastq.tl
+
+### Education on DNA
+1. src/synbio/complement.tl
+
 ### Thanks
 Much of the code here is translated from [Poly](https://github.com/TimothyStiles/poly), a wonderful project you should follow.
