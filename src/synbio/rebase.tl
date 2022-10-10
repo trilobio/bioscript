@@ -168,3 +168,83 @@ REBASE codes for commercial sources of enzymes
 ```
 
 --]]---------------------------------------------------------------------------
+
+local record rebase
+    record RestrictionEnzyme
+        name: string
+        isoschizomers: {string} -- other enzymes with the same recognition and cut site
+        recognition_sequence: string
+        methylation_site: string
+        microorganism: string
+        source: string
+        commercial_availability: {string}
+        references: string
+    end
+    parse: function(string): {string: RestrictionEnzyme}
+end
+
+function rebase.parse(input: string): {string: rebase.RestrictionEnzyme}
+    local enzymes: {string: rebase.RestrictionEnzyme} = {}
+    local enzyme: rebase.RestrictionEnzyme = {isoschizomers = {}, commercial_availability = {}}
+
+    local commercial_suppliers: {string: string} = {}
+    local start_commercial_parsing: boolean = false
+    local commercial_parsing_line: integer = 0
+
+    for line in string.gmatch(input, '[^\r\n]+') do
+        -- Parse commercial sources
+        if line == "REBASE codes for commercial sources of enzymes" then
+            start_commercial_parsing = true
+        end
+        if start_commercial_parsing then
+            -- If enzyme parsing has started, break the commercial supplier parsing
+            if line:find("<1>") then
+                start_commercial_parsing = false
+                commercial_parsing_line = 0
+            end
+
+            commercial_parsing_line = commercial_parsing_line + 1
+            local stripped_line = line:gsub('^%s*(.-)%s*$', '%1')
+            if (commercial_parsing_line > 3) and (stripped_line:len() > 0) then
+                -- The first letter of the stripped_line is the single letter code
+                local commercial_code_letter = stripped_line:sub(1,1)
+                -- There are 8 spaces until the commercial companies's name. We
+                -- also remove the date parathesis, and then strip the line
+                -- once again.
+                local commercial_name = stripped_line:sub(9,-1):gsub('%b()', ''):gsub('^%s*(.-)%s*$', '%1')
+
+                commercial_suppliers[commercial_code_letter] = commercial_name
+            end
+        end
+
+        -- Normal enzyme parsing
+        local str = line:sub(3,-1)
+        if line:find("<1>") then
+            enzyme.name = str
+        elseif line:find("<2>") then
+            for isoschizomer in str:gmatch('([^,]+)') do
+                enzyme.isoschizomers[#enzyme.isoschizomers+1] = isoschizomer
+            end
+        elseif line:find("<3>") then
+            enzyme.recognition_sequence = str
+        elseif line:find("<4>") then
+            enzyme.methylation_site = str
+        elseif line:find("<5>") then
+            enzyme.microorganism = str
+        elseif line:find("<6>") then
+            enzyme.source = str
+        elseif line:find("<7>") then
+            -- we need to get a list of specific commercial suppliers from the
+            -- commerical_suppliers table
+            for idx = 1, #str do
+                enzyme.commercial_availability[#enzyme.commercial_availability+1] = commercial_suppliers[str:sub(idx,idx)]
+            end
+        elseif line:find("<8>") then
+            enzyme.references = str
+            -- after every <8>  a new enzyme will start. So we put the current enzyme into enzymeMap and setup a new enzyme
+            enzymes[enzyme.name] = enzyme
+            enzyme = {isoschizomers = {}, commercial_availability = {}}
+        end
+    end
+    return enzymes
+end
