@@ -24,13 +24,14 @@ device. Acceptable quality values:
  opqrstuvwxyz{|}~
 
 
-For example, one entry in a FASTQ file could look like:
+== Example FASTQ entry ===
 ```
  @SEQ_ID
  GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAATCCATTTGTTCAACTCACAGTTT
  +
  !''*((((***+))%%%++)(%%%%).1***-+*''))**55CCF>>>>>>CCCCCCC65
 ```
+
 --]]---------------------------------------------------------------------------
 local record fastq
     record Fastq

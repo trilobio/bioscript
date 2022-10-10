@@ -18,14 +18,28 @@ To build from source and run all tests, run:
 make
 ```
 
-## Reading the source
+# Reading the source
 
-### File formats
-1. src/synbio/fasta.tl
-2. src/synbio/fastq.tl
+## File formats
+1. `src/synbio/fasta.tl`
+2. `src/synbio/fastq.tl`
+3. `src/synbio/genbank.tl`
 
-### Education on DNA
-1. src/synbio/complement.tl
+## Education on DNA
+1. `src/synbio/complement.tl`
+
+### GoldenGate assembly tract
+1. `src/synbio/rebase.tl`
+2. `src/synbio/restriction_digest.tl`
+3. `src/synbio/ligation.tl`
+4. `src/synbio/goldengate.tl`
+
+### Gibson assembly tract
+1. `src/synbio/pcr.tl`
+2. `src/synbio/primers.tl`
+3. `src/synbio/ligation.tl`
+4. `src/synbio/gibson.tl`
+
 
 ### Thanks
 Much of the code here is translated from [Poly](https://github.com/TimothyStiles/poly), a wonderful project you should follow.
