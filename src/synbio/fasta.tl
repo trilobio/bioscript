@@ -18,7 +18,7 @@ Though not a part of the official format, often additional data is separated
 by '|', similar to how commas are used in CSV files for data entry.
 
 
-An example FASTA file:
+=== Example FASTA file ===
 ```
  >MCHU - Calmodulin - Human, rabbit, bovine, rat, and chicken
  MADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTID
@@ -32,7 +32,8 @@ An example FASTA file:
  IENY
 ```
 
-References:
+
+=== References===
 [1] https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp
 --]]---------------------------------------------------------------------------
 local record fasta

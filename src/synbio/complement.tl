@@ -41,7 +41,8 @@ There are many of them, but the most common are:
 This particular module implements a single function to get the reverse
 complement of a DNA sequence.
 
-References:
+
+=== References ===
 [1] https://en.wikipedia.org/wiki/DNA
 [2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
 [3] https://en.wikipedia.org/wiki/Nucleic_acid_notation

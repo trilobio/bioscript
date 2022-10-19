@@ -50,6 +50,7 @@ test/synbio/complement.lua
 
 
 
+
      5 local complement = {}
 
 
@@ -75,8 +76,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   130 for k, v in pairs(complement.COMPLEMENTS) do
-   360    complement.COMPLEMENTS[k:lower()] = v:lower()
+   135 for k, v in pairs(complement.COMPLEMENTS) do
+   390    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -84,14 +85,14 @@ test/synbio/complement.lua
 
 
      5 function complement.reverse_complement(sequence)
- 25422    sequence = sequence:upper()
- 12711    local s = ""
- 71750    for i = 1, #sequence do
- 59039       local base = sequence:sub(i, i)
- 59039       if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
- 59039       s = s .. complement.COMPLEMENTS[base]
+ 25412    sequence = sequence:upper()
+ 12706    local s = ""
+ 71547    for i = 1, #sequence do
+ 58841       local base = sequence:sub(i, i)
+ 58841       if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+ 58841       s = s .. complement.COMPLEMENTS[base]
           end
- 12711    return s:reverse()
+ 12706    return s:reverse()
        end
 
      5 return complement
@@ -100,6 +101,7 @@ test/synbio/complement.lua
 test/synbio/fasta.lua
 ==============================================================================
      1 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local string = _tl_compat and _tl_compat.string or string
+
 
 
 
@@ -184,6 +186,7 @@ test/synbio/fasta.lua
 test/synbio/fastq.lua
 ==============================================================================
      1 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local string = _tl_compat and _tl_compat.string or string
+
 
 
 
@@ -494,6 +497,8 @@ test/synbio/genbank.lua
 
 
 
+
+
      1 local complement = require("complement")
      1 local json = require("json")
 
@@ -623,7 +628,7 @@ test/synbio/genbank.lua
    790       if type(obj) ~= 'table' then return obj end
    147       local obj_table = obj
    147       local res = setmetatable({}, getmetatable(obj))
-  1446       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+  1299       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
    147       return res
           end
 
@@ -1120,7 +1125,7 @@ test/synbio/json.lua
        }
 
      2 local escape_char_map_inv = { ["/"] = "/" }
-    18 for k, v in pairs(escape_char_map) do
+    16 for k, v in pairs(escape_char_map) do
     14    escape_char_map_inv[v] = k
        end
 
@@ -1143,11 +1148,11 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-    12       for k in pairs(val) do
-     7          if type(k) ~= "number" then
+     8       for k in pairs(val) do
+     6          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
-     6          n = n + 1
+     5          n = n + 1
              end
      2       if n ~= #val then
      1          error("invalid table: sparse array")
@@ -1161,13 +1166,13 @@ test/synbio/json.lua
 
           else
 
-    13       for k, v in pairs(val) do
-     7          if type(k) ~= "string" then
+     9       for k, v in pairs(val) do
+     8          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
-     3          local stack_value = encode(v, stack)
-     3          if stack_value ~= nil then
-     9             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+     4          local stack_value = encode(v, stack)
+     4          if stack_value ~= nil then
+    12             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
                 end
              end
      1       stack[val] = nil
@@ -1176,16 +1181,16 @@ test/synbio/json.lua
        end
 
        local function encode_string(val)
-    17    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+    18    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
        end
 
 
        local function encode_number(val)
 
-    15    if val ~= val or val <= -math.huge or val >= math.huge then
+    17    if val ~= val or val <= -math.huge or val >= math.huge then
      3       error("unexpected number value '" .. tostring(val) .. "'")
           end
-    12    return string.format("%.14g", val)
+    14    return string.format("%.14g", val)
        end
 
 
@@ -1198,10 +1203,10 @@ test/synbio/json.lua
        }
 
        encode = function(val, stack)
-    43    local t = type(val)
-    43    local f = type_func_map[t]
-    43    if f then
-    43       return f(val, stack)
+    46    local t = type(val)
+    46    local f = type_func_map[t]
+    46    if f then
+    46       return f(val, stack)
           end
 *****0    if t ~= "function" then
 *****0       error("unexpected type '" .. t .. "'")
@@ -1600,17 +1605,17 @@ test/synbio/pcr.lua
 
 
           local function generate_pcr_fragments(s, f, r, forward_primer_indexes, reverse_primer_indexes)
-    17       local gen_pcr_fragments = {}
-    52       for _, forward_primer_index in ipairs(forward_primer_indexes) do
-    18          local minimal_primer = minimal_primer_binds[forward_primer_index]
-    18          local full_primer_forward = primer_list[forward_primer_index]
-    54          for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
-    18             local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
-    54             local pcr_fragment = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f, r) .. full_primer_reverse
-    18             gen_pcr_fragments[#gen_pcr_fragments + 1] = pcr_fragment
+    12       local gen_pcr_fragments = {}
+    37       for _, forward_primer_index in ipairs(forward_primer_indexes) do
+    13          local minimal_primer = minimal_primer_binds[forward_primer_index]
+    13          local full_primer_forward = primer_list[forward_primer_index]
+    39          for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
+    13             local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
+    39             local pcr_fragment = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f, r - 1) .. full_primer_reverse
+    13             gen_pcr_fragments[#gen_pcr_fragments + 1] = pcr_fragment
                 end
              end
-    17       return gen_pcr_fragments
+    12       return gen_pcr_fragments
           end
 
 
@@ -1658,14 +1663,14 @@ test/synbio/pcr.lua
     12       local forward_locations_indexes = {}
     12       local reverse_locations_inverted = {}
     12       local reverse_locations_indexes = {}
-    48       for idx, values in pairs(forward_locations) do
+    36       for idx, values in pairs(forward_locations) do
     72          for _, value in ipairs(values) do
     24             if forward_locations_inverted[value] == nil then forward_locations_inverted[value] = {} end
     24             forward_locations_inverted[value][#forward_locations_inverted[value] + 1] = idx
     24             forward_locations_indexes[#forward_locations_indexes + 1] = value
                 end
              end
-    44       for idx, values in pairs(reverse_locations) do
+    32       for idx, values in pairs(reverse_locations) do
     56          for _, value in ipairs(values) do
     16             if reverse_locations_inverted[value] == nil then reverse_locations_inverted[value] = {} end
     16             reverse_locations_inverted[value][#reverse_locations_inverted[value] + 1] = idx
@@ -1682,9 +1687,6 @@ test/synbio/pcr.lua
 
     37             for _, reverse_match_start in ipairs(reverse_locations_indexes) do
     18                if (forward_match_start < reverse_match_start) and (reverse_match_start < forward_locations_indexes[idx + 1]) then
-    20                   for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-     5                      pcr_fragments[#pcr_fragments + 1] = fragment
-                         end
     20                   for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
      5                      pcr_fragments[#pcr_fragments + 1] = fragment
                          end
@@ -1707,11 +1709,11 @@ test/synbio/pcr.lua
 
 
     12    local fragment_set = {}
-    42    for _, fragment in ipairs(pcr_fragments) do
-    18       fragment_set[fragment] = true
+    37    for _, fragment in ipairs(pcr_fragments) do
+    13       fragment_set[fragment] = true
           end
     12    pcr_fragments = {}
-    37    for fragment, _ in pairs(fragment_set) do
+    25    for fragment, _ in pairs(fragment_set) do
     13       pcr_fragments[#pcr_fragments + 1] = fragment
           end
     12    return pcr_fragments
@@ -1873,6 +1875,272 @@ test/synbio/primers.lua
      2 return primers
 
 ==============================================================================
+test/synbio/rebase.lua
+==============================================================================
+     1 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local string = _tl_compat and _tl_compat.string or string
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     1 local rebase = {RestrictionEnzyme = {}, }
+
+
+
+
+
+
+
+
+
+
+
+
+
+     1 function rebase.parse(input)
+     1    local enzymes = {}
+     1    local enzyme = { isoschizomers = {}, commercial_availability = {}, references = {} }
+
+     1    local commercial_suppliers = {}
+     1    local start_commercial_parsing = false
+     1    local commercial_parsing_line = 0
+
+     1    local first_enzyme = true
+
+   226    for line in string.gmatch(input, '[^\r\n]+') do
+
+   224       if line == "REBASE codes for commercial sources of enzymes" then
+     1          start_commercial_parsing = true
+             end
+   224       if start_commercial_parsing then
+
+    17          if line:find("<1>") then
+     1             start_commercial_parsing = false
+     1             commercial_parsing_line = 0
+                end
+
+    17          commercial_parsing_line = commercial_parsing_line + 1
+    17          local stripped_line = line:gsub('^%s*(.-)%s*$', '%1')
+    30          if (commercial_parsing_line > 3) and (stripped_line:len() > 0) then
+
+    13             local commercial_code_letter = stripped_line:sub(1, 1)
+
+
+
+    26             local commercial_name = stripped_line:sub(9, -1):gsub('%b()', ''):gsub('^%s*(.-)%s*$', '%1')
+
+    13             commercial_suppliers[commercial_code_letter] = commercial_name
+                end
+             end
+
+
+   224       local str = line:sub(4, -1)
+   224       if line:find("<1>") then
+    16          if first_enzyme == true then
+     1             first_enzyme = false
+                else
+
+    15             enzymes[enzyme.name] = enzyme
+    15             enzyme = { isoschizomers = {}, commercial_availability = {}, references = {} }
+                end
+    16          enzyme.name = str
+   208       elseif line:find("<2>") then
+  1216          for isoschizomer in str:gmatch('([^,]+)') do
+  1200             enzyme.isoschizomers[#enzyme.isoschizomers + 1] = isoschizomer
+                end
+   192       elseif line:find("<3>") then
+    16          enzyme.recognition_sequence = str
+   176       elseif line:find("<4>") then
+    16          enzyme.methylation_site = str
+   160       elseif line:find("<5>") then
+    16          enzyme.microorganism = str
+   144       elseif line:find("<6>") then
+    16          enzyme.source = str
+   128       elseif line:find("<7>") then
+
+
+    19          for idx = 1, #str do
+     6             enzyme.commercial_availability[#enzyme.commercial_availability + 1] = commercial_suppliers[str:sub(idx, idx)]
+                end
+   112       elseif line:find("<8>") then
+    16          enzyme.references[#enzyme.references + 1] = str
+             else
+    96          enzyme.references[#enzyme.references + 1] = line
+             end
+          end
+
+     1    enzymes[enzyme.name] = enzyme
+     1    return enzymes
+       end
+
+     1 return rebase
+
+==============================================================================
 Summary
 ==============================================================================
 
@@ -1884,7 +2152,8 @@ test/synbio/fastq.lua      29   0      100.00%
 test/synbio/fragment.lua   65   30     68.42%
 test/synbio/genbank.lua    232  57     80.28%
 test/synbio/json.lua       187  9      95.41%
-test/synbio/pcr.lua        127  0      100.00%
+test/synbio/pcr.lua        125  0      100.00%
 test/synbio/primers.lua    62   0      100.00%
+test/synbio/rebase.lua     49   0      100.00%
 -----------------------------------------------
-Total                      738  96     88.49%
+Total                      785  96     89.10%
