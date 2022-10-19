@@ -76,8 +76,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   150 for k, v in pairs(complement.COMPLEMENTS) do
-   435    complement.COMPLEMENTS[k:lower()] = v:lower()
+   135 for k, v in pairs(complement.COMPLEMENTS) do
+   390    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 

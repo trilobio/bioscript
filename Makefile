@@ -6,7 +6,8 @@ test:
 	mkdir test ;\
 	tl build -b test -q ;\
 	busted -c -m "./test/synbio/?.lua;./test/std/?.lua" ;\
-	rm -rf test
+	rm -rf test ;\
+	tail luacov.report.out -c 10 | xargs echo "__code coverage:" | sed -e 's/$$/__/' | awk -v n="$$(</dev/stdin)" 'NR==2 {$$0=n} { print }' README.md > README.md.tmp && mv README.md.tmp README.md
 
 build:
 	@mkdir build ;\
