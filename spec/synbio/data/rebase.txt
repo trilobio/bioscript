@@ -1,0 +1,262 @@
+ 
+REBASE version 210                                              withrefm.210
+ 
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    REBASE, The Restriction Enzyme Database   http://rebase.neb.com
+    Copyright (c)  Dr. Richard J. Roberts, 2022.   All rights reserved.
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ 
+Rich Roberts                                                    Sep 28 2022
+ 
+
+<ENZYME NAME>   Restriction enzyme name.
+<ISOSCHIZOMERS> Other enzymes with this specificity.
+<RECOGNITION SEQUENCE> 
+                These are written from 5' to 3', only one strand being given.
+                If the point of cleavage has been determined, the precise site
+                is marked with ^.  For enzymes such as HgaI, MboII etc., which
+                cleave away from their recognition sequence the cleavage sites
+                are indicated in parentheses.  
+
+                For example HgaI GACGC (5/10) indicates cleavage as follows:
+                                5' GACGCNNNNN^      3'
+                                3' CTGCGNNNNNNNNNN^ 5'
+
+                In all cases the recognition sequences are oriented so that
+                the cleavage sites lie on their 3' side.
+
+                REBASE Recognition sequences representations use the standard 
+                abbreviations (Eur. J. Biochem. 150: 1-5, 1985) to represent 
+                ambiguity.
+                                R = G or A
+                                Y = C or T
+                                M = A or C
+                                K = G or T
+                                S = G or C
+                                W = A or T
+                                B = not A (C or G or T)
+                                D = not C (A or G or T)
+                                H = not G (A or C or T)
+                                V = not T (A or C or G)
+                                N = A or C or G or T
+
+
+
+                ENZYMES WITH UNUSUAL CLEAVAGE PROPERTIES:  
+
+                Enzymes that cut on both sides of their recognition sequences,
+                such as BcgI, Bsp24I, CjeI and CjePI, have 4 cleavage sites
+                each instead of 2.
+
+                Bsp24I
+                          5'      ^NNNNNNNNGACNNNNNNTGGNNNNNNNNNNNN^   3'
+                          3' ^NNNNNNNNNNNNNCTGNNNNNNACCNNNNNNN^        5'
+
+
+                This will be described in some REBASE reports as:
+
+                             Bsp24I (8/13)GACNNNNNNTGG(12/7)
+
+<METHYLATION SITE>
+                The site of methylation by the cognate methylase when known
+                is indicated X(Y) or X,X2(Y,Y2), where X is the base within
+                the recognition sequence that is modified.  A negative number
+                indicates the complementary strand, numbered from the 5' base 
+                of that strand, and Y is the specific type of methylation 
+                involved:
+                               (6) = N6-methyladenosine 
+                               (5) = 5-methylcytosine 
+                               (4) = N4-methylcytosine
+
+                If the methylation information is different for the 3' strand,
+                X2 and Y2 are given as well.
+
+<MICROORGANISM> Organism from which this enzyme had been isolated.
+<SOURCE>        Either an individual or a National Culture Collection.
+<COMMERCIAL AVAILABILITY>
+                Each commercial source of restriction enzymes and/or methylases
+                listed in REBASE is assigned a single character abbreviation 
+                code.  For example:
+
+                K        Takara (1/98)
+                M        Boehringer Mannheim (10/97)
+                N        New England Biolabs (4/98)
+ 
+                The date in parentheses indicates the most recent update of 
+                that organization's listings in REBASE.
+
+<REFERENCES>only the primary references for the isolation and/or purification
+of the restriction enzyme or methylase, the determination of the recognition
+sequence and cleavage site or the methylation specificity are given.
+
+
+REBASE codes for commercial sources of enzymes
+
+                B        Thermo Fisher Scientific (7/22)
+                C        Minotech Biotechnology (1/22)
+                E        Agilent Technologies (8/20)
+                I        SibEnzyme Ltd. (12/21)
+                J        Nippon Gene Co., Ltd. (7/22)
+                K        Takara Bio Inc. (3/22)
+                M        Roche Applied Science (9/21)
+                N        New England Biolabs (7/22)
+                O        Toyobo Biochemicals (8/14)
+                Q        Molecular Biology Resources - CHIMERx (7/22)
+                R        Promega Corporation (11/20)
+                S        Sigma Chemical Corporation (5/21)
+                V        Vivantis Technologies (1/18)
+                X        EURx Ltd. (7/22)
+                Y        SinaClon BioScience Co. (1/18)
+
+<1>AaaI
+<2>XmaIII,BseX3I,BsoDI,BstZI,EagI,EclXI,Eco52I,SenPT16I,TauII,Tsp504I
+<3>C^GGCCG
+<4>
+<5>Acetobacter aceti ss aceti
+<6>M. Fukaya
+<7>
+<8>Tagami, H., Tayama, K., Tohyama, T., Fukaya, M., Okumura, H., Kawamura, Y., Horinouchi, S., Beppu, T., (1988) FEMS Microbiol. Lett., vol. 56, pp. 161-166.
+
+<1>I-AabMI
+<2>
+<3>CAGGTACCCTTTAAACCTACTAACCC(-12/-16)
+<4>
+<5>Ascocalyx abietina
+<6>B.L. Stoddard
+<7>
+<8>Lambert, A.R., Hallinan, J.P., Shen, B.W., Chik, J.K., Bolduc, J.M., Kulshina, N., Robins, L.I., Kaiser, B.K., Jarjour, J., Havens, K., Scharenberg, A.M., Stoddard, B.L., (2016) Structure, vol. 24, pp. 862-873.
+
+<1>AacLI
+<2>BamHI,AaeI,AcaII,AccEBI,AinII,AliI,Ali12257I,Ali12258I,ApaCI,AsiI,AspTII,Atu1II,BamFI,BamKI,BamNI,Bca1259I,Bce751I,Bco10278I,BnaI,BsaDI,Bsp30I,Bsp46I,Bsp90II,Bsp98I,Bsp130I,Bsp131I,Bsp144I,Bsp4009I,BspAAIII,BstI,Bst1126I,Bst2464I,Bst2902I,BstQI,Bsu90I,Bsu8565I,Bsu8646I,BsuB519I,BsuB763I,CelI,DdsI,GdoI,GinI,GoxI,GseIII,GstI,MleI,Mlu23I,NasBI,Nsp29132II,NspSAIV,OkrAI,Pac1110I,Pae177I,PboCI,Pfl8I,Psp56I,RhsI,Rlu4I,RspLKII,SolI,SpvI,SurI,Uba19I,Uba31I,Uba38I,Uba51I,Uba88I,Uba1098I,Uba1163I,Uba1167I,Uba1172I,Uba1173I,Uba1205I,Uba1224I,Uba1242I,Uba1250I,Uba1258I,Uba1297I,Uba1302I,Uba1324I,Uba1325I,Uba1334I,Uba1339I,Uba1346I,Uba1383I,Uba1398I,Uba1402I,Uba1414I,Uba4009I,UbaN3I,UbaN14I
+<3>GGATCC
+<4>
+<5>Acetobacter aceti sub. liquefaciens
+<6>IFO 12388
+<7>
+<8>Seurinck, J., van Montagu, M., Unpublished observations.
+
+<1>AaeI
+<2>BamHI,AacLI,AcaII,AccEBI,AinII,AliI,Ali12257I,Ali12258I,ApaCI,AsiI,AspTII,Atu1II,BamFI,BamKI,BamNI,Bca1259I,Bce751I,Bco10278I,BnaI,BsaDI,Bsp30I,Bsp46I,Bsp90II,Bsp98I,Bsp130I,Bsp131I,Bsp144I,Bsp4009I,BspAAIII,BstI,Bst1126I,Bst2464I,Bst2902I,BstQI,Bsu90I,Bsu8565I,Bsu8646I,BsuB519I,BsuB763I,CelI,DdsI,GdoI,GinI,GoxI,GseIII,GstI,MleI,Mlu23I,NasBI,Nsp29132II,NspSAIV,OkrAI,Pac1110I,Pae177I,PboCI,Pfl8I,Psp56I,RhsI,Rlu4I,RspLKII,SolI,SpvI,SurI,Uba19I,Uba31I,Uba38I,Uba51I,Uba88I,Uba1098I,Uba1163I,Uba1167I,Uba1172I,Uba1173I,Uba1205I,Uba1224I,Uba1242I,Uba1250I,Uba1258I,Uba1297I,Uba1302I,Uba1324I,Uba1325I,Uba1334I,Uba1339I,Uba1346I,Uba1383I,Uba1398I,Uba1402I,Uba1414I,Uba4009I,UbaN3I,UbaN14I
+<3>GGATCC
+<4>
+<5>Acetobacter aceti sub. liquefaciens
+<6>M. Van Montagu
+<7>
+<8>Seurinck, J., van Montagu, M., Unpublished observations.
+
+<1>AagI
+<2>ClaI,Apu16I,Asp14I,Asp37I,Asp86I,Asp123I,Asp130I,Asp707I,BanIII,BavCI,BazI,BbvAII,Bci29I,BciBI,BcmI,Bco79I,BdiI,BfrAI,Bli41I,Bli86I,Bli576I,Bli585I,BliAI,BliRI,BpsII,Bsa29I,BscI,BseCI,Bsh108AI,BshVI,BsiXI,Bsp2I,Bsp4I,Bsp84I,Bsp106I,Bsp125I,Bsp126I,Bsp127I,Bsp145I,BspDI,BspJII,BspOVII,BspXI,BspZEI,BsrCI,Bst28I,BstLVI,BstNZ169I,Bsu15I,BsuTUI,Bth1202I,Bth9415I,BtuI,Csp4I,LcaI,LplI,PgaI,Rme21I,SonI,SpmI,Ssp27144I,Uba22I,Uba24I,Uba30I,Uba34I,Uba43I,Uba1096I,Uba1100I,Uba1133I,Uba1137I,Uba1138I,Uba1144I,Uba1145I,Uba1161I,Uba1168I,Uba1195I,Uba1196I,Uba1197I,Uba1198I,Uba1199I,Uba1200I,Uba1233I,Uba1238I,Uba1246I,Uba1257I,Uba1275I,Uba1286I,Uba1295I,Uba1315I,Uba1342I,Uba1366II,Uba1379I,Uba1380I,Uba1394I,Uba1412I,Uba1416I,Uba1427I,Uba1430I,Uba1451I,Uba1453I,UbaN18I,UbaN22I,ZhoI
+<3>AT^CGAT
+<4>
+<5>Achromobacter agile
+<6>N.N. Sokolov
+<7>
+<8>Sokolov, N.N., Maneliene, Z.P., Butkus, V.V., Fitzner, A.B., Khoroshutina, E.B., Kalugin, A.A., Janulaitis, A., (1990) Bioorg. Khim., vol. 16, pp. 1040-1044.
+
+<1>AamI
+<2>
+<3>?
+<4>
+<5>Azospirillum amazonense
+<6>G. Schwabe
+<7>
+<8>Schwabe, G., Posseckert, G., Klingmuller, W., (1985) Gene, vol. 39, pp. 113-116.
+
+<1>M.Aam10684I
+<2>HinfI,CviBI,CviCI,CviDI,CviEI,CviFI,CviGI,FnuAI,HhaII,HpyIV,HpyAIV,Hpy87AI,HpyF2II,HpyF10II,HpyF18I,HpyF38I,HpyF44I,HpyF55II,HpyF60I,HpyF71III,HpyF72III,NcaI,NovII,NsiHI,SscL1I
+<3>GANTC
+<4>2(6)
+<5>Aminobacter aminovorans NCTC10684
+<6>S. Doyle
+<7>
+<8>Informatics, P., Unpublished observations.
+
+<1>Aam10684II
+<2>M.SspLM7II
+<3>ACCGAG
+<4>5(6)
+<5>Aminobacter aminovorans NCTC10684
+<6>S. Doyle
+<7>
+<8>Informatics, P., Unpublished observations.
+
+<1>AanI
+<2>PsiI
+<3>TTA^TAA
+<4>
+<5>Arthrobacter aurescens RFL2
+<6>Fermentas G324
+<7>B
+<8>Vitkute, J., Lapcinskaja, S., Capskaja, L., Zakareviciene, L., Janulaitis, A., Unpublished observations.
+
+<1>M.Aap248I
+<2>MboI,Asi256I,AspMDI,AsuMBI,Bbr02I,Bce243I,Bfi57I,BfiSHI,BfuCI,Bme12I,Bme2494I,BsaPI,BscFI,BscXII,BsmXII,BspI,Bsp9I,Bsp18I,Bsp49I,Bsp51I,Bsp52I,Bsp54I,Bsp57I,Bsp58I,Bsp59I,Bsp60I,Bsp61I,Bsp64I,Bsp65I,Bsp66I,Bsp67I,Bsp72I,Bsp74I,Bsp76I,Bsp91I,Bsp105I,Bsp122I,Bsp135I,Bsp136I,Bsp138I,Bsp143I,Bsp147I,Bsp2095I,BspAI,BspFI,BspJI,BspJ64I,BspKMI,BspKT6I,BsrMI,BsrPII,BssGII,BssMI,Bst19II,Bst1274I,BstEIII,BstENII,BstKTI,BstMBI,BstXII,BtcI,Bth84I,Bth211I,Bth213I,Bth221I,Bth945I,Bth1140I,Bth1141I,Bth1786I,Bth1997I,BthCanI,BtkII,Btu33I,Btu34I,Btu36I,Btu37I,Btu39I,Btu41I,CacI,CcoLI,CcoP31I,CcoP76I,CcoP84I,CcoP95II,CcoP219I,CcyI,CdiCD6II,ChaI,Cin1467I,CjeP338I,CpaPI,CpfI,CpfAI,Csp5I,Cte1179I,Cte1180I,CtyI,CviAI,CviHI,DpnII,EsaLHCI,FnuAII,FnuCI,FnuEI,Gst1588II,HacI,HpyAIII,HpyHPK5II,Kzo9I,LlaAI,LlaDCHI,LlaKR2I,Lsp1109II,Mel3JI,Mel5JI,Mel7JI,Mel4OI,Mel5OI,Mel2TI,Mel5TI,MeuI,MgoI,MhyGDL1III,MjaIII,MkrAI,MmeII,Mmu5I,MmuP2I,MnoIII,MosI,Msp67II,MspBI,MthI,Mth1047I,MthAI,NciAI,NdeII,NflI,NflAII,NflBI,NlaII,NlaDI,NmeCI,NphI,NsiAI,NspAI,NsuI,PbrTI,Pei9403I,PfaI,Pph288I,RalF40I,Rlu1I,SalAI,SalHI,Sau15I,Sau6782I,Sau3AI,SauCI,SauDI,SauEI,SauFI,SauGI,SauMI,SinMI,SmiMBI,Spn23FI,SsiAI,SsiBI,Ssu211I,Ssu212I,Ssu220I,R1.Ssu2479I,R2.Ssu2479I,R1.Ssu4109I,R2.Ssu4109I,R1.Ssu4961I,R2.Ssu4961I,R1.Ssu8074I,R2.Ssu8074I,R1.Ssu11318I,R2.Ssu11318I,R1.SsuDAT1I,R2.SsuDAT1I,Sth368I,TrsKTI,TrsSI,TrsTI,TruII,Tsp133I,Uba4I,Uba59I,Uba1101I,Uba1177I,Uba1182I,Uba1183I,Uba1204I,Uba1259I,Uba1317I,Uba1323I,Uba1366I,UbaN1I,Vha44I
+<3>GATC
+<4>2(6)
+<5>Aggregatibacter aphrophilus FDAARGOS_248
+<6>B. Goldberg
+<7>
+<8>Campos, J., Goldberg, B., Tallon, L.J., Sadzewicz, L., Sengamalay, N., Ott, S., Godinez, A., Nagaraj, S., Vyas, G., Aluvathingal, J., Nadendla, S., Geyer, C., Nandy, P., Hobson, J., Sichtig, H., Unpublished observations.
+
+<1>M.Aap5906II
+<2>MboI,Asi256I,AspMDI,AsuMBI,Bbr02I,Bce243I,Bfi57I,BfiSHI,BfuCI,Bme12I,Bme2494I,BsaPI,BscFI,BscXII,BsmXII,BspI,Bsp9I,Bsp18I,Bsp49I,Bsp51I,Bsp52I,Bsp54I,Bsp57I,Bsp58I,Bsp59I,Bsp60I,Bsp61I,Bsp64I,Bsp65I,Bsp66I,Bsp67I,Bsp72I,Bsp74I,Bsp76I,Bsp91I,Bsp105I,Bsp122I,Bsp135I,Bsp136I,Bsp138I,Bsp143I,Bsp147I,Bsp2095I,BspAI,BspFI,BspJI,BspJ64I,BspKMI,BspKT6I,BsrMI,BsrPII,BssGII,BssMI,Bst19II,Bst1274I,BstEIII,BstENII,BstKTI,BstMBI,BstXII,BtcI,Bth84I,Bth211I,Bth213I,Bth221I,Bth945I,Bth1140I,Bth1141I,Bth1786I,Bth1997I,BthCanI,BtkII,Btu33I,Btu34I,Btu36I,Btu37I,Btu39I,Btu41I,CacI,CcoLI,CcoP31I,CcoP76I,CcoP84I,CcoP95II,CcoP219I,CcyI,CdiCD6II,ChaI,Cin1467I,CjeP338I,CpaPI,CpfI,CpfAI,Csp5I,Cte1179I,Cte1180I,CtyI,CviAI,CviHI,DpnII,EsaLHCI,FnuAII,FnuCI,FnuEI,Gst1588II,HacI,HpyAIII,HpyHPK5II,Kzo9I,LlaAI,LlaDCHI,LlaKR2I,Lsp1109II,Mel3JI,Mel5JI,Mel7JI,Mel4OI,Mel5OI,Mel2TI,Mel5TI,MeuI,MgoI,MhyGDL1III,MjaIII,MkrAI,MmeII,Mmu5I,MmuP2I,MnoIII,MosI,Msp67II,MspBI,MthI,Mth1047I,MthAI,NciAI,NdeII,NflI,NflAII,NflBI,NlaII,NlaDI,NmeCI,NphI,NsiAI,NspAI,NsuI,PbrTI,Pei9403I,PfaI,Pph288I,RalF40I,Rlu1I,SalAI,SalHI,Sau15I,Sau6782I,Sau3AI,SauCI,SauDI,SauEI,SauFI,SauGI,SauMI,SinMI,SmiMBI,Spn23FI,SsiAI,SsiBI,Ssu211I,Ssu212I,Ssu220I,R1.Ssu2479I,R2.Ssu2479I,R1.Ssu4109I,R2.Ssu4109I,R1.Ssu4961I,R2.Ssu4961I,R1.Ssu8074I,R2.Ssu8074I,R1.Ssu11318I,R2.Ssu11318I,R1.SsuDAT1I,R2.SsuDAT1I,Sth368I,TrsKTI,TrsSI,TrsTI,TruII,Tsp133I,Uba4I,Uba59I,Uba1101I,Uba1177I,Uba1182I,Uba1183I,Uba1204I,Uba1259I,Uba1317I,Uba1323I,Uba1366I,UbaN1I,Vha44I
+<3>GATC
+<4>2(6)
+<5>Aggregatibacter aphrophilus ATCC 33389 NCTC5906
+<6>P. Informatics
+<7>
+<8>Informatics, P., Unpublished observations.
+
+<1>M.Aap5908I
+<2>MboI,Asi256I,AspMDI,AsuMBI,Bbr02I,Bce243I,Bfi57I,BfiSHI,BfuCI,Bme12I,Bme2494I,BsaPI,BscFI,BscXII,BsmXII,BspI,Bsp9I,Bsp18I,Bsp49I,Bsp51I,Bsp52I,Bsp54I,Bsp57I,Bsp58I,Bsp59I,Bsp60I,Bsp61I,Bsp64I,Bsp65I,Bsp66I,Bsp67I,Bsp72I,Bsp74I,Bsp76I,Bsp91I,Bsp105I,Bsp122I,Bsp135I,Bsp136I,Bsp138I,Bsp143I,Bsp147I,Bsp2095I,BspAI,BspFI,BspJI,BspJ64I,BspKMI,BspKT6I,BsrMI,BsrPII,BssGII,BssMI,Bst19II,Bst1274I,BstEIII,BstENII,BstKTI,BstMBI,BstXII,BtcI,Bth84I,Bth211I,Bth213I,Bth221I,Bth945I,Bth1140I,Bth1141I,Bth1786I,Bth1997I,BthCanI,BtkII,Btu33I,Btu34I,Btu36I,Btu37I,Btu39I,Btu41I,CacI,CcoLI,CcoP31I,CcoP76I,CcoP84I,CcoP95II,CcoP219I,CcyI,CdiCD6II,ChaI,Cin1467I,CjeP338I,CpaPI,CpfI,CpfAI,Csp5I,Cte1179I,Cte1180I,CtyI,CviAI,CviHI,DpnII,EsaLHCI,FnuAII,FnuCI,FnuEI,Gst1588II,HacI,HpyAIII,HpyHPK5II,Kzo9I,LlaAI,LlaDCHI,LlaKR2I,Lsp1109II,Mel3JI,Mel5JI,Mel7JI,Mel4OI,Mel5OI,Mel2TI,Mel5TI,MeuI,MgoI,MhyGDL1III,MjaIII,MkrAI,MmeII,Mmu5I,MmuP2I,MnoIII,MosI,Msp67II,MspBI,MthI,Mth1047I,MthAI,NciAI,NdeII,NflI,NflAII,NflBI,NlaII,NlaDI,NmeCI,NphI,NsiAI,NspAI,NsuI,PbrTI,Pei9403I,PfaI,Pph288I,RalF40I,Rlu1I,SalAI,SalHI,Sau15I,Sau6782I,Sau3AI,SauCI,SauDI,SauEI,SauFI,SauGI,SauMI,SinMI,SmiMBI,Spn23FI,SsiAI,SsiBI,Ssu211I,Ssu212I,Ssu220I,R1.Ssu2479I,R2.Ssu2479I,R1.Ssu4109I,R2.Ssu4109I,R1.Ssu4961I,R2.Ssu4961I,R1.Ssu8074I,R2.Ssu8074I,R1.Ssu11318I,R2.Ssu11318I,R1.SsuDAT1I,R2.SsuDAT1I,Sth368I,TrsKTI,TrsSI,TrsTI,TruII,Tsp133I,Uba4I,Uba59I,Uba1101I,Uba1177I,Uba1182I,Uba1183I,Uba1204I,Uba1259I,Uba1317I,Uba1323I,Uba1366I,UbaN1I,Vha44I
+<3>GATC
+<4>2(6)
+<5>Aggregatibacter aphrophilus NCTC5908
+<6>S. Doyle
+<7>
+<8>Informatics, P., Unpublished observations.
+
+<1>M.Aap10433II
+<2>MboI,Asi256I,AspMDI,AsuMBI,Bbr02I,Bce243I,Bfi57I,BfiSHI,BfuCI,Bme12I,Bme2494I,BsaPI,BscFI,BscXII,BsmXII,BspI,Bsp9I,Bsp18I,Bsp49I,Bsp51I,Bsp52I,Bsp54I,Bsp57I,Bsp58I,Bsp59I,Bsp60I,Bsp61I,Bsp64I,Bsp65I,Bsp66I,Bsp67I,Bsp72I,Bsp74I,Bsp76I,Bsp91I,Bsp105I,Bsp122I,Bsp135I,Bsp136I,Bsp138I,Bsp143I,Bsp147I,Bsp2095I,BspAI,BspFI,BspJI,BspJ64I,BspKMI,BspKT6I,BsrMI,BsrPII,BssGII,BssMI,Bst19II,Bst1274I,BstEIII,BstENII,BstKTI,BstMBI,BstXII,BtcI,Bth84I,Bth211I,Bth213I,Bth221I,Bth945I,Bth1140I,Bth1141I,Bth1786I,Bth1997I,BthCanI,BtkII,Btu33I,Btu34I,Btu36I,Btu37I,Btu39I,Btu41I,CacI,CcoLI,CcoP31I,CcoP76I,CcoP84I,CcoP95II,CcoP219I,CcyI,CdiCD6II,ChaI,Cin1467I,CjeP338I,CpaPI,CpfI,CpfAI,Csp5I,Cte1179I,Cte1180I,CtyI,CviAI,CviHI,DpnII,EsaLHCI,FnuAII,FnuCI,FnuEI,Gst1588II,HacI,HpyAIII,HpyHPK5II,Kzo9I,LlaAI,LlaDCHI,LlaKR2I,Lsp1109II,Mel3JI,Mel5JI,Mel7JI,Mel4OI,Mel5OI,Mel2TI,Mel5TI,MeuI,MgoI,MhyGDL1III,MjaIII,MkrAI,MmeII,Mmu5I,MmuP2I,MnoIII,MosI,Msp67II,MspBI,MthI,Mth1047I,MthAI,NciAI,NdeII,NflI,NflAII,NflBI,NlaII,NlaDI,NmeCI,NphI,NsiAI,NspAI,NsuI,PbrTI,Pei9403I,PfaI,Pph288I,RalF40I,Rlu1I,SalAI,SalHI,Sau15I,Sau6782I,Sau3AI,SauCI,SauDI,SauEI,SauFI,SauGI,SauMI,SinMI,SmiMBI,Spn23FI,SsiAI,SsiBI,Ssu211I,Ssu212I,Ssu220I,R1.Ssu2479I,R2.Ssu2479I,R1.Ssu4109I,R2.Ssu4109I,R1.Ssu4961I,R2.Ssu4961I,R1.Ssu8074I,R2.Ssu8074I,R1.Ssu11318I,R2.Ssu11318I,R1.SsuDAT1I,R2.SsuDAT1I,Sth368I,TrsKTI,TrsSI,TrsTI,TruII,Tsp133I,Uba4I,Uba59I,Uba1101I,Uba1177I,Uba1182I,Uba1183I,Uba1204I,Uba1259I,Uba1317I,Uba1323I,Uba1366I,UbaN1I,Vha44I
+<3>GATC
+<4>2(6)
+<5>Aggregatibacter aphrophilus W10433
+<6>M.E. Holder
+<7>
+<8>Holder, M.E., Ajami, N.J., Petrosino, J.F., Unpublished observations.
+
+<1>AaqI
+<2>ApaLI,Alw44I,AmeI,Bsp146I,DaqI,Pfl23I,Pfr12I,PliI,ScoNI,SnoI,Uba1203I,Uba1387I,VneI
+<3>GTGCAC
+<4>
+<5>Alcaligenes aquamarinus 559
+<6>V.E. Repin
+<7>
+<8>Repin, V.E., Unpublished observations.
+
+<1>AarI
+<2>PaqCI
+<3>CACCTGC(4/8)
+<4>
+<5>Arthrobacter aurescens SS2-322
+<6>A. Janulaitis
+<7>B
+<8>Grigaite, R., Maneliene, Z., Janulaitis, A., (2002) Nucleic Acids Res., vol. 30.
+Maneliene, Z., Zakareviciene, L., Unpublished observations.
+
+<1>BsaI
+<2>Eco31I,Bli49I,Bli161I,Bli576II,Bli736I,Bli5508I,Bso31I,BspTNI,Bsu537I,Cfr56I,Eco42I,Eco51I,Eco95I,Eco97I,Eco101I,Eco120I,Eco127I,Eco129I,Eco155I,Eco156I,Eco157I,Eco162I,Eco185I,Eco191I,Eco203I,Eco204I,Eco205I,Eco217I,Eco225I,Eco233I,Eco239I,Eco240I,Eco241I,Eco246I,Eco247I,Eco263I,EcoA4I,Eco71KI,EcoO44I,PpaI,Rle69I,Sau12I,SlbI,Uba65I,Uba84I,Uba1316I,Uba1343I,VpaK57I,VpaK57AI,VpaKutHI
+<3>GGTCTC(1/5)
+<4>-4(6)
+<5>Bacillus stearothermophilus 6-55
+<6>Z. Chen
+<7>N
+<8>Flodman, K., Xu, S.-Y., Unpublished observations.
+Fomenkov, A., Unpublished observations.
+Kong, H., Chen, Z., Unpublished observations.
+Morgan, R.D., Unpublished observations.
+Xu, S.-Y., Unpublished observations.
+Zhu, Z., Xu, S.-Y., Unpublished observations.
+Zhu, Z., Xu, S.-Y., US Patent Office, 2003.
+
+

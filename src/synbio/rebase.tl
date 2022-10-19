@@ -178,18 +178,20 @@ local record rebase
         microorganism: string
         source: string
         commercial_availability: {string}
-        references: string
+        references: {string}
     end
     parse: function(string): {string: RestrictionEnzyme}
 end
 
 function rebase.parse(input: string): {string: rebase.RestrictionEnzyme}
     local enzymes: {string: rebase.RestrictionEnzyme} = {}
-    local enzyme: rebase.RestrictionEnzyme = {isoschizomers = {}, commercial_availability = {}}
+    local enzyme: rebase.RestrictionEnzyme = {isoschizomers = {}, commercial_availability = {}, references = {}}
 
     local commercial_suppliers: {string: string} = {}
     local start_commercial_parsing: boolean = false
     local commercial_parsing_line: integer = 0
+
+    local first_enzyme = true
 
     for line in string.gmatch(input, '[^\r\n]+') do
         -- Parse commercial sources
@@ -218,8 +220,15 @@ function rebase.parse(input: string): {string: rebase.RestrictionEnzyme}
         end
 
         -- Normal enzyme parsing
-        local str = line:sub(3,-1)
+        local str = line:sub(4,-1)
         if line:find("<1>") then
+            if first_enzyme == true then
+              first_enzyme = false
+            else
+              -- put the current enzyme into enzymeMap and setup a new enzyme
+              enzymes[enzyme.name] = enzyme
+              enzyme = {isoschizomers = {}, commercial_availability = {}, references = {}}
+            end
             enzyme.name = str
         elseif line:find("<2>") then
             for isoschizomer in str:gmatch('([^,]+)') do
@@ -240,11 +249,14 @@ function rebase.parse(input: string): {string: rebase.RestrictionEnzyme}
                 enzyme.commercial_availability[#enzyme.commercial_availability+1] = commercial_suppliers[str:sub(idx,idx)]
             end
         elseif line:find("<8>") then
-            enzyme.references = str
-            -- after every <8>  a new enzyme will start. So we put the current enzyme into enzymeMap and setup a new enzyme
-            enzymes[enzyme.name] = enzyme
-            enzyme = {isoschizomers = {}, commercial_availability = {}}
+          enzyme.references[#enzyme.references+1] = str
+        else
+          enzyme.references[#enzyme.references+1] = line
         end
     end
+    -- Final enzyme
+    enzymes[enzyme.name] = enzyme
     return enzymes
 end
+
+return rebase

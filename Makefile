@@ -18,6 +18,7 @@ build:
 	sed '$$d' src/synbio/pcr.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/genbank.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/fragment.tl >> tmp.tl ;\
+	sed '$$d' src/synbio/rebase.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/codon.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/synbio.tl >> tmp.tl ;\
 	sed '$$d' src/std/atoms.tl >> tmp.tl ;\
