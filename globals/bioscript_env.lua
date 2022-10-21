@@ -4,6 +4,7 @@ local std = std_func()
 _G.encode = std.json.encode
 
 _G.new_tube = std.inventory.new_tube
+_G.new_well = std.inventory.new_well
 _G.new_plate = std.inventory.new_plate
 _G.new_tipbox = std.inventory.new_tipbox
 

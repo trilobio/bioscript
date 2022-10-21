@@ -240,7 +240,7 @@ test/std/inventory.lua
      1 local mixtures = require("mixtures")
      1 local util = require("util")
 
-     1 local inventory = {Sample = {}, Tube = {}, Plate = {}, }
+     1 local inventory = {Sample = {}, Tube = {}, NewTube = {}, Plate = {}, NewPlate = {}, NewTipbox = {}, }
 
 
 
@@ -395,47 +395,70 @@ test/std/inventory.lua
 
 
 
-     1 plate = {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
        inventory.new_sample = function(mixture)
-     4    return { id = util.uuid(), mixture = mixture }
+     2    return { id = util.uuid(), mixture = mixture }
        end
 
-       inventory.new_tube = function(name, address, mixture, datamatrix, capped)
-     2    local new_tube = {}
-     4    new_tube.id = util.uuid()
-     2    new_tube.name = name
-     4    new_tube.sample = inventory.new_sample(mixture)
-     2    new_tube.datamatrix = datamatrix
-     2    new_tube.capped = capped
-     2    new_tube.address = address
-     2    plate.tubes[#plate.tubes + 1] = new_tube
-     2    return new_tube
+       local function new_tube(self, new_tube_tbl)
+     1    local tube = {}
+     2    tube.id = util.uuid()
+     1    tube.name = new_tube_tbl.name
+     2    tube.sample = inventory.new_sample(new_tube_tbl.mixture)
+     1    tube.datamatrix = new_tube_tbl.datamatrix
+     1    tube.capped = new_tube_tbl.capped
+     1    tube.address = new_tube_tbl.address
+     1    self.tubes[#self.tubes + 1] = tube
        end
 
-       inventory.new_plate = function(name, labware)
-     1    plate = {}
+       inventory.new_plate = function(new_plate_tbl)
+     1    local plate = {}
      2    plate.id = util.uuid()
-     1    plate.name = name
-     1    plate.labware = labware
+     1    plate.name = new_plate_tbl.name
+     1    plate.labware = new_plate_tbl.labware
      1    plate.tubes = {}
+
+     1    plate.new_tube = new_tube
+     1    plate.new_well = new_tube
      1    return plate
        end
 
-       inventory.new_tipbox = function(labware)
-     1    plate = {}
-     2    plate.id = util.uuid()
-     1    plate.name = labware
-     1    plate.labware = labware
-     1    plate.tubes = {}
-    97    for i = 1, 96 do
-    96       local new_tube = {}
-   192       new_tube.id = util.uuid()
-    96       new_tube.name = "tip"
-    96       new_tube.address = i - 1
-    96       plate.tubes[i] = new_tube
+       inventory.new_tipbox = function(labware_input)
+     2    local plate = {}
+          local labware
+     2    if type(labware_input) == "string" then
+     1       labware = labware_input
+          else
+     1       labware = labware_input.labware
           end
-     1    return plate
+     4    plate.id = util.uuid()
+     2    plate.name = labware
+     2    plate.labware = labware
+     2    plate.tubes = {}
+   194    for i = 1, 96 do
+   192       local tube = {}
+   384       tube.id = util.uuid()
+   192       tube.name = "tip"
+   192       tube.address = i - 1
+   192       plate.tubes[i] = tube
+          end
+     2    return plate
        end
 
      1 return inventory
@@ -538,37 +561,37 @@ test/std/mixtures.lua
 
 
        local function deepcopy(obj)
-  2600    if type(obj) ~= 'table' then return obj end
-   491    local obj_table = obj
-   491    local res = setmetatable({}, getmetatable(obj))
-  4247    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
-   491    return res
+  2547    if type(obj) ~= 'table' then return obj end
+   480    local obj_table = obj
+   480    local res = setmetatable({}, getmetatable(obj))
+  4158    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+   480    return res
        end
 
 
        mixtures.volume = function(self, volume)
-     2    local copy = deepcopy(self)
+     1    local copy = deepcopy(self)
 
-     2    local water_quantity = nil
-    24    for _, chemical in ipairs(copy.chemicals) do
-    20       if chemical.chemical.inchi == mixtures.chemicals.H2O.inchi then
-     2          water_quantity = chemical.quantity
+     1    local water_quantity = nil
+    19    for _, chemical in ipairs(copy.chemicals) do
+    17       if chemical.chemical.inchi == mixtures.chemicals.H2O.inchi then
+     1          water_quantity = chemical.quantity
              end
           end
-     2    if water_quantity == nil then
+     1    if water_quantity == nil then
 *****0       error("no volume")
           end
-     2    local ratio = volume / water_quantity
-    24    for _, chemical in ipairs(copy.chemicals) do
-    20       chemical.quantity = chemical.quantity * ratio
+     1    local ratio = volume / water_quantity
+    19    for _, chemical in ipairs(copy.chemicals) do
+    17       chemical.quantity = chemical.quantity * ratio
           end
 
-     2    if copy.cells ~= nil then
+     1    if copy.cells ~= nil then
 *****0       for _, cell in ipairs(copy.cells) do
 *****0          cell.quantity = cell.quantity * ratio
              end
           end
-     2    return copy
+     1    return copy
        end
 
 
@@ -958,11 +981,11 @@ test/std/util.lua
 
 
        util.uuid = function()
-   204    local u, _ = string.gsub('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx', '[xy]', function(c)
-  3162       local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
-  3162       return string.format('%x', v)
+   394    local u, _ = string.gsub('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx', '[xy]', function(c)
+  6107       local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
+  6107       return string.format('%x', v)
           end)
-   102    return u
+   197    return u
        end
 
      1 return util
@@ -1044,8 +1067,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   130 for k, v in pairs(complement.COMPLEMENTS) do
-   375    complement.COMPLEMENTS[k:lower()] = v:lower()
+    95 for k, v in pairs(complement.COMPLEMENTS) do
+   270    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -2047,11 +2070,11 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-     9       for k in pairs(val) do
-     7          if type(k) ~= "number" then
+     8       for k in pairs(val) do
+     6          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
-     6          n = n + 1
+     5          n = n + 1
              end
      2       if n ~= #val then
      1          error("invalid table: sparse array")
@@ -2065,13 +2088,13 @@ test/synbio/json.lua
 
           else
 
-     8       for k, v in pairs(val) do
-     7          if type(k) ~= "string" then
+     9       for k, v in pairs(val) do
+     8          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
-     3          local stack_value = encode(v, stack)
-     3          if stack_value ~= nil then
-     9             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+     4          local stack_value = encode(v, stack)
+     4          if stack_value ~= nil then
+    12             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
                 end
              end
      1       stack[val] = nil
@@ -2080,16 +2103,16 @@ test/synbio/json.lua
        end
 
        local function encode_string(val)
-    17    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+    18    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
        end
 
 
        local function encode_number(val)
 
-    15    if val ~= val or val <= -math.huge or val >= math.huge then
+    17    if val ~= val or val <= -math.huge or val >= math.huge then
      3       error("unexpected number value '" .. tostring(val) .. "'")
           end
-    12    return string.format("%.14g", val)
+    14    return string.format("%.14g", val)
        end
 
 
@@ -2102,10 +2125,10 @@ test/synbio/json.lua
        }
 
        encode = function(val, stack)
-    43    local t = type(val)
-    43    local f = type_func_map[t]
-    43    if f then
-    43       return f(val, stack)
+    46    local t = type(val)
+    46    local f = type_func_map[t]
+    46    if f then
+    46       return f(val, stack)
           end
 *****0    if t ~= "function" then
 *****0       error("unexpected type '" .. t .. "'")
@@ -2784,7 +2807,7 @@ File                       Hits Missed Coverage
 -----------------------------------------------
 test/std/atoms.lua         27   0      100.00%
 test/std/conversions.lua   22   0      100.00%
-test/std/inventory.lua     33   0      100.00%
+test/std/inventory.lua     36   0      100.00%
 test/std/mixtures.lua      194  58     76.98%
 test/std/util.lua          7    0      100.00%
 test/synbio/complement.lua 15   0      100.00%
@@ -2796,4 +2819,4 @@ test/synbio/json.lua       187  9      95.41%
 test/synbio/pcr.lua        127  0      100.00%
 test/synbio/primers.lua    62   0      100.00%
 -----------------------------------------------
-Total                      1021 154    86.89%
+Total                      1024 154    86.93%

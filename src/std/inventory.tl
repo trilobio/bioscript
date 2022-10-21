@@ -16,16 +16,33 @@ local record inventory
     capped: boolean
     sample: Sample
   end
-  new_tube: function(string, integer, mixtures.Mixture, string, boolean): Tube
-  add_tube: function(Tube, integer): Plate
+  record NewTube
+    name: string
+    datamatrix: string
+    address: integer
+    capped: boolean
+    mixture: mixtures.Mixture
+  end
+
   record Plate
     id: string
     name: string
     labware: Labware
     tubes: {Tube}
+
+    new_tube: function(Plate, NewTube)
+    new_well: function(Plate, NewTube)
   end
-  new_plate: function(string, Labware): Plate
-  new_tipbox: function(Labware): Plate
+  record NewPlate
+    name: string
+    labware: Labware
+  end
+  new_plate: function(NewPlate): Plate
+
+  record NewTipbox
+    labware: Labware
+  end
+  new_tipbox: function(NewTipbox | string): Plate
 
   address_to_integer: {string: integer}
   integer_to_address: {integer: string}
@@ -156,45 +173,51 @@ local record inventory
   end
 end
 
-global plate: inventory.Plate = {}
-
 inventory.new_sample = function(mixture: mixtures.Mixture): inventory.Sample
   return {id = util.uuid(), mixture = mixture} as inventory.Sample
 end
 
-inventory.new_tube = function(name: string, address: integer, mixture: mixtures.Mixture, datamatrix: string, capped: boolean): inventory.Tube
-  local new_tube: inventory.Tube = {}
-  new_tube.id = util.uuid()
-  new_tube.name = name
-  new_tube.sample = inventory.new_sample(mixture)
-  new_tube.datamatrix = datamatrix
-  new_tube.capped = capped
-  new_tube.address = address
-  plate.tubes[#plate.tubes+1] = new_tube
-  return new_tube
+local function new_tube(self: inventory.Plate, new_tube_tbl: inventory.NewTube)
+  local tube: inventory.Tube = {}
+  tube.id = util.uuid()
+  tube.name = new_tube_tbl.name
+  tube.sample = inventory.new_sample(new_tube_tbl.mixture)
+  tube.datamatrix = new_tube_tbl.datamatrix
+  tube.capped = new_tube_tbl.capped
+  tube.address = new_tube_tbl.address
+  self.tubes[#self.tubes+1] = tube
 end
 
-inventory.new_plate = function(name: string, labware: inventory.Labware): inventory.Plate
-  global plate: inventory.Plate = {}
+inventory.new_plate = function(new_plate_tbl: inventory.NewPlate): inventory.Plate
+  local plate: inventory.Plate = {}
   plate.id = util.uuid()
-  plate.name = name
-  plate.labware = labware
+  plate.name = new_plate_tbl.name
+  plate.labware = new_plate_tbl.labware
   plate.tubes = {}
+
+  plate.new_tube = new_tube
+  plate.new_well = new_tube
   return plate
 end
 
-inventory.new_tipbox = function(labware: inventory.Labware): inventory.Plate
-  global plate: inventory.Plate = {}
+inventory.new_tipbox = function(labware_input: inventory.NewTipbox | string): inventory.Plate
+  local plate: inventory.Plate = {}
+  local labware: inventory.Labware
+  if labware_input is string then
+    labware = labware_input as inventory.Labware
+  else
+    labware = labware_input.labware
+  end
   plate.id = util.uuid()
   plate.name = labware
   plate.labware = labware
   plate.tubes = {}
   for i=1,96 do
-    local new_tube: inventory.Tube = {}
-    new_tube.id = util.uuid()
-    new_tube.name = "tip"
-    new_tube.address = i-1
-    plate.tubes[i] = new_tube
+    local tube: inventory.Tube = {}
+    tube.id = util.uuid()
+    tube.name = "tip"
+    tube.address = i-1
+    plate.tubes[i] = tube
   end
   return plate
 end

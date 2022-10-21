@@ -2699,7 +2699,7 @@ util.uuid = function()
 end
 
 
-local inventory = {Sample = {}, Tube = {}, Plate = {}, }
+local inventory = {Sample = {}, Tube = {}, NewTube = {}, Plate = {}, NewPlate = {}, NewTipbox = {}, }
 
 
 
@@ -2854,45 +2854,68 @@ local inventory = {Sample = {}, Tube = {}, Plate = {}, }
 
 
 
-plate = {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 inventory.new_sample = function(mixture)
    return { id = util.uuid(), mixture = mixture }
 end
 
-inventory.new_tube = function(name, address, mixture, datamatrix, capped)
-   local new_tube = {}
-   new_tube.id = util.uuid()
-   new_tube.name = name
-   new_tube.sample = inventory.new_sample(mixture)
-   new_tube.datamatrix = datamatrix
-   new_tube.capped = capped
-   new_tube.address = address
-   plate.tubes[#plate.tubes + 1] = new_tube
-   return new_tube
+local function new_tube(self, new_tube_tbl)
+   local tube = {}
+   tube.id = util.uuid()
+   tube.name = new_tube_tbl.name
+   tube.sample = inventory.new_sample(new_tube_tbl.mixture)
+   tube.datamatrix = new_tube_tbl.datamatrix
+   tube.capped = new_tube_tbl.capped
+   tube.address = new_tube_tbl.address
+   self.tubes[#self.tubes + 1] = tube
 end
 
-inventory.new_plate = function(name, labware)
-   plate = {}
+inventory.new_plate = function(new_plate_tbl)
+   local plate = {}
    plate.id = util.uuid()
-   plate.name = name
-   plate.labware = labware
+   plate.name = new_plate_tbl.name
+   plate.labware = new_plate_tbl.labware
    plate.tubes = {}
+
+   plate.new_tube = new_tube
+   plate.new_well = new_tube
    return plate
 end
 
-inventory.new_tipbox = function(labware)
-   plate = {}
+inventory.new_tipbox = function(labware_input)
+   local plate = {}
+   local labware
+   if type(labware_input) == "string" then
+      labware = labware_input
+   else
+      labware = labware_input.labware
+   end
    plate.id = util.uuid()
    plate.name = labware
    plate.labware = labware
    plate.tubes = {}
    for i = 1, 96 do
-      local new_tube = {}
-      new_tube.id = util.uuid()
-      new_tube.name = "tip"
-      new_tube.address = i - 1
-      plate.tubes[i] = new_tube
+      local tube = {}
+      tube.id = util.uuid()
+      tube.name = "tip"
+      tube.address = i - 1
+      plate.tubes[i] = tube
    end
    return plate
 end
