@@ -8,10 +8,10 @@ has two hydrogen bonds with the other stand's complementing thymine. Guanine,
 on the other hand, has three hydrogen bonds with the other strand's
 complementing cytosine[1].
 
-A: Adenine
-T: Thymine
-G: Guanine
-C: Cytosine
+ A: Adenine
+ T: Thymine
+ G: Guanine
+ C: Cytosine
 
 Each DNA strand has a certain direction (known as the 3prime or 5prime end,
 usually written as 3' or 5')[2]. These directions have important biological
@@ -20,8 +20,8 @@ while oligos can only be chemically synthesized in the 3' to 5' direction. The
 double helix's complementing DNA strands run in opposite directions to each
 other. For example, look at the following DNA sequence:
 
-5' A T G C 3'
-3' T A C G 5'
+ 5' A T G C 3'
+ 3' T A C G 5'
 
 DNA, when read as a string on a computer, is always in the 5' to 3' direction.
 That means the two strands producing the above DNA sequence are "ATGC" and
@@ -34,14 +34,15 @@ Finally, there are certain occassions where we need have "degenerate" base
 pairs, which are string representations of different possible base pairs[3].
 There are many of them, but the most common are:
 
-N (any): A, T, G, C
-W (weak): A, T
-S (strong): G, C
+ N (any): A, T, G, C
+ W (weak): A, T
+ S (strong): G, C
 
 This particular module implements a single function to get the reverse
 complement of a DNA sequence.
 
-References:
+
+=== References ===
 [1] https://en.wikipedia.org/wiki/DNA
 [2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
 [3] https://en.wikipedia.org/wiki/Nucleic_acid_notation

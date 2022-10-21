@@ -143,7 +143,7 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
       local full_primer_forward = primer_list[forward_primer_index]
       for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
         local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
-        local pcr_fragment: string = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f,r) .. full_primer_reverse
+        local pcr_fragment: string = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f,r-1) .. full_primer_reverse
         gen_pcr_fragments[#gen_pcr_fragments+1] = pcr_fragment
       end
     end
@@ -222,9 +222,6 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
             for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
               pcr_fragments[#pcr_fragments+1] = fragment
             end
-              for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[  reverse_match_start])) do
-                pcr_fragments[#pcr_fragments+1] = fragment
-              end
             break
           end
         end

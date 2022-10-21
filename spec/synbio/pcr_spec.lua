@@ -9,6 +9,8 @@ describe("pcr", function()
       local primers = {"TATATGGTCTCTTCATTTAAGAAAGCGCATTTTCCAGC", "TTATAGGTCTCATACTAATAATTACACCGAGATAACACATCATGG", "CTGCAGGTCGACTCTAG"}
       local fragments = pcr.simulate({{sequence = gene, circular = false}}, primers, 55.0)
       assert(#fragments, 1, "Should only have one fragment")
+      local target_sequence = "TTATAGGTCTCATACTAATAATTACACCGAGATAACACATCATGGATAAACCGATACTCAAAGATTCTATGAAGCTATTTGAGGCACTTGGTACGATCAAGTCGCGCTCAATGTTTGGTGGCTTCGGACTTTTCGCTGATGAAACGATGTTTGCACTGGTTGTGAATGATCAACTTCACATACGAGCAGACCAGCAAACTTCATCTAACTTCGAGAAGCAAGGGCTAAAACCGTACGTTTATAAAAAGCGTGGTTTTCCAGTCGTTACTAAGTACTACGCGATTTCCGACGACTTGTGGGAATCCAGTGAACGCTTGATAGAAGTAGCGAAGAAGTCGTTAGAACAAGCCAATTTGGAAAAAAAGCAACAGGCAAGTAGTAAGCCCGACAGGTTGAAAGACCTGCCTAACTTACGACTAGCGACTGAACGAATGCTTAAGAAAGCTGGTATAAAATCAGTTGAACAACTTGAAGAGAAAGGTGCATTGAATGCTTACAAAGCGATACGTGACTCTCACTCCGCAAAAGTAAGTATTGAGCTACTCTGGGCTTTAGAAGGAGCGATAAACGGCACGCACTGGAGCGTCGTTCCTCAATCTCGCAGAGAAGAGCTGGAAAATGCGCTTTCTTAAATGAAGAGACCATATA"
+      assert(fragments[1] == target_sequence, "Should amplify: " .. target_sequence .. " Got: " .. fragments[1])
     end)
 
     it("should simulate more than one forward", function()
@@ -28,16 +30,18 @@ describe("pcr", function()
       local outside_forward_primer = "gtcgttcctcaatctcgcagagaagagctggaaaatg"
 
       local fragments = pcr.simulate({{sequence = gene, circular = false}}, {internal_primer, reverse_primer, outside_forward_primer}, 55.0)
-      assert(#fragments, 1, "Should only have one fragment")
+      assert(#fragments == 1, "Should only have one fragment")
+      local target_sequence = "GATACTCAAAGATTCTATGAAGCTATTTGAGGCACTTGGTACGATCAAGTCGCGCTCAATGTTTGGTGGCTTCGGACTTTTCGCTGATGAAACGATGTTTGCACTGGTTGTGAATGATCAACTTCACATACGAGCAGACCAGCAAACTTCATCTAACTTCGAGAAGCAAGGGCTAAAACCGTACGTTTATAAAAAGCGTGGTTTTCCAGTCGTTACTAAGTACTACGCGATTTCCGACGACTTGTGGGAATCCAGTGAACGCTTGATAGAAGTAGCGAAGAAGTCGTTAGAACAAGCCAATTTGGAAAAAAAGCAACAGGCAAGTAGTAAGCCCGACAGGTTGAAAGACCTGCCTAACTTACGACTAGCGACTGAACGAATGCTTAAGAAAGCTGGTATAAAATCAGTTGAACAACTTGAAGAGAAAGGTGCATTGAATGCTTACAAAGCGATA"
+      assert(fragments[1] == target_sequence, "Should amplify: " .. target_sequence .. " Got: " .. fragments[1])
     end)
 
     it("should simulate PCR on a circular DNA", function()
       -- This tests for ciruclar sequences
       local forward_primer = "actctgggctttagaaggagcgataaacggc"
       local reverse_primer = "aagtgcctcaaatagcttcatagaatctttgagtatcgg"
-      local target_fragment = "ACTCTGGGCTTTAGAAGGAGCGATAAACGGCACGCACTGGAGCGTCGTTCCTCAATCTCGCAGAGAAGAGCTGGAAAATGCGCTTTCTTAAAATAATTACACCGAGATAACACATCATGGATAAACCGATACTCAAAGATTCTATGAAGCTATTTGAGGCACTT"
+      local target_sequence = "ACTCTGGGCTTTAGAAGGAGCGATAAACGGCACGCACTGGAGCGTCGTTCCTCAATCTCGCAGAGAAGAGCTGGAAAATGCGCTTTCTTAAAATAATTACACCGAGATAACACATCATGGATAAACCGATACTCAAAGATTCTATGAAGCTATTTGAGGCACTT"
       local fragments = pcr.simulate({{sequence = gene, circular = true}}, {forward_primer, reverse_primer}, 55.0)
-      assert(fragments[1], target_fragment, "Didn't get target fragment from circular pcr.")
+      assert(fragments[1] == target_sequence, "Should amplify: " .. target_sequence .. " Got: " .. fragments[1])
     end)
 
     it("should simulate concatemerization", function()
@@ -49,27 +53,31 @@ describe("pcr", function()
     it("should get ending PCRs", function()
       local primers = {"TATATGGTCTCTTCATTTAAGAAAGCGCATTTTCCAGC", "TTATAGGTCTCATACTAATAATTACACCGAGATAACACATCATGG", "actctgggctttagaaggagcgataaacggc"}
       local fragments = pcr.simulate({{sequence = gene, circular = false}}, primers, 55.0)
-      assert(#fragments, 1, "Should only have one fragment")
+      assert(#fragments == 1, "Should only have one fragment")
+      local target_sequence = "ACTCTGGGCTTTAGAAGGAGCGATAAACGGCACGCACTGGAGCGTCGTTCCTCAATCTCGCAGAGAAGAGCTGGAAAATGCGCTTTCTTAAATGAAGAGACCATATA"
+      assert(fragments[1] == target_sequence, "Should amplify: " .. target_sequence .. " Got: " .. fragments[1])
     end)
 
     it("should work with a primer on the origin",  function()
       local primers = {"gcgctttcttaaaataattacaccgagataacac", "ctggattcccacaagtcgtcggaaatcgcgtagtac"}
       local fragments = pcr.simulate({{sequence = gene, circular = true}}, primers, 55.0)
-      assert(#fragments, 1, "Should produce one fragment")
+      assert(#fragments == 1, "Should produce one fragment")
+      local target_sequence = "GCGCTTTCTTAAAATAATTACACCGAGATAACACATCATGGATAAACCGATACTCAAAGATTCTATGAAGCTATTTGAGGCACTTGGTACGATCAAGTCGCGCTCAATGTTTGGTGGCTTCGGACTTTTCGCTGATGAAACGATGTTTGCACTGGTTGTGAATGATCAACTTCACATACGAGCAGACCAGCAAACTTCATCTAACTTCGAGAAGCAAGGGCTAAAACCGTACGTTTATAAAAAGCGTGGTTTTCCAGTCGTTACTAAGTACTACGCGATTTCCGACGACTTGTGGGAATCCAG"
+      assert(fragments[1] == target_sequence, "Should amplify: " .. target_sequence .. " Got: " .. fragments[1])
     end)
   end)
 
   describe("design", function()
     it("should design primers", function()
       local fwd, rev = pcr.design_primers(gene, 55)
-      assert(fwd, "AATAATTACACCGAGATAACACATCATGG")
-      assert(rev, "TTAAGAAAGCGCATTTTCCAGC")
+      assert(fwd == "AATAATTACACCGAGATAACACATCATGG")
+      assert(rev == "TTAAGAAAGCGCATTTTCCAGC")
     end)
     
     it("should design primers with the right overhangs", function()
       local fwd, rev = pcr.design_primers_with_overhang(gene, "ATGC", "ATGC", 55)
-      assert(fwd, "ATGCAATAATTACACCGAGATAACACATCATGG")
-      assert(rev, "TACGTTAAGAAAGCGCATTTTCCAGC")
+      assert(fwd == "ATGCAATAATTACACCGAGATAACACATCATGG", "expected: " .. "ATGCAATAATTACACCGAGATAACACATCATGG" .." got: " .. fwd)
+      assert(rev == "GCATTTAAGAAAGCGCATTTTCCAGC", "expected: " .. "GCATTTAAGAAAGCGCATTTTCCAGC" .. " got: " .. rev)
     end)
   end)
 end)
