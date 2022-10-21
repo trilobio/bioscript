@@ -11,8 +11,8 @@ test:
 
 build:
 	@mkdir build ;\
+	sed '$$d' src/std/json.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/complement.tl >> tmp.tl ;\
-	sed '$$d' src/synbio/json.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/fasta.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/fastq.tl >> tmp.tl ;\
 	sed '$$d' src/synbio/primers.tl >> tmp.tl ;\
@@ -26,6 +26,7 @@ build:
 	sed '$$d' src/std/conversions.tl >> tmp.tl ;\
 	sed '$$d' src/std/mixtures.tl >> tmp.tl ;\
 	sed '$$d' src/std/util.tl >> tmp.tl ;\
+	sed '$$d' src/std/inventory.tl >> tmp.tl ;\
 	sed '$$d' src/std/biologic_commands.tl >> tmp.tl ;\
 	cat src/std/std.tl >> tmp.tl ;\
 	sed -i '/require/d' tmp.tl ;\

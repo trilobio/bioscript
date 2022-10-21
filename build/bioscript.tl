@@ -1,96 +1,3 @@
---[[---------------------------------------------------------------------------
-The complement module provides functions for getting the reverse complement
-of a given DNA sequence.
-
-DNA, as a double helix, contains two strands of single-stranded DNA bonded to
-each other through hydrogren bonds on each strand's base pairs. In DNA, adenine
-has two hydrogen bonds with the other stand's complementing thymine. Guanine,
-on the other hand, has three hydrogen bonds with the other strand's
-complementing cytosine[1].
-
-A: Adenine
-T: Thymine
-G: Guanine
-C: Cytosine
-
-Each DNA strand has a certain direction (known as the 3prime or 5prime end,
-usually written as 3' or 5')[2]. These directions have important biological
-consequences: DNA polymerase can only synthesize DNA in the 5' to 3' direction,
-while oligos can only be chemically synthesized in the 3' to 5' direction. The
-double helix's complementing DNA strands run in opposite directions to each
-other. For example, look at the following DNA sequence:
-
-5' A T G C 3'
-3' T A C G 5'
-
-DNA, when read as a string on a computer, is always in the 5' to 3' direction.
-That means the two strands producing the above DNA sequence are "ATGC" and
-"GCAT". When a function makes a "reverse complement" of a strand, it means
-converting from an input of ATGC to an output of GCAT. Reverse complementing
-is important in simulating how enzymes and other strands will interact with
-a DNA strand of interest.
-
-Finally, there are certain occassions where we need have "degenerate" base
-pairs, which are string representations of different possible base pairs[3].
-There are many of them, but the most common are:
-
-N (any): A, T, G, C
-W (weak): A, T
-S (strong): G, C
-
-This particular module implements a single function to get the reverse
-complement of a DNA sequence.
-
-References:
-[1] https://en.wikipedia.org/wiki/DNA
-[2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
-[3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
-
-]]-----------------------------------------------------------------------------
-local record complement
-	COMPLEMENTS: {string:string}
-  reverse_complement: function(string): string
-end
-
---- complement.COMPLEMENTS are DNA base complements.
--- @table COMPLEMENTS
-complement.COMPLEMENTS = {
-	A = "T",
-	B = "V",
-	C = "G",
-	D = "H",
-	G = "C",
-	H = "D",
-	K = "M",
-	M = "K",
-	N = "N",
-	R = "Y",
-	S = "S",
-	T = "A",
-	U = "A",
-	V = "B",
-	W = "W",
-	Y = "R",
-}
-for k, v in pairs(complement.COMPLEMENTS) do
-	complement.COMPLEMENTS[k:lower()] = v:lower()
-end
-
---- Returns reverse complement of a sequence, returns empty string if unknown character.
--- @param sequence the sequence to reverse complement
--- @return the reverse complement
--- @usage local s = complement.reverse_complement("ATGC")
-function complement.reverse_complement(sequence: string): string
-  sequence = sequence:upper()
-	local s: string = ""
-	for i = 1, #sequence do
-    local base = sequence:sub(i,i)
-		if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
-		s = s .. complement.COMPLEMENTS[base]
-	end
-	return s:reverse()
-end
-
 local record json
 	decode: function(string): any
 	encode: function(any): string
@@ -180,7 +87,7 @@ local function encode_number(val:number): string
   if val ~= val or val <= -math.huge or val >= math.huge then
     error("unexpected number value '" .. tostring(val) .. "'")
   end
-  return string.format("%.14g", val)
+  return string.format("%.18g", val) -- 53 bit significand precision gives 15-17 significant digits. We do 18 to be safe.
 end
 
 
@@ -449,6 +356,99 @@ function json.decode(str: string): table
     decode_error(str, idx, "trailing garbage")
   end
   return res
+end
+
+--[[---------------------------------------------------------------------------
+The complement module provides functions for getting the reverse complement
+of a given DNA sequence.
+
+DNA, as a double helix, contains two strands of single-stranded DNA bonded to
+each other through hydrogren bonds on each strand's base pairs. In DNA, adenine
+has two hydrogen bonds with the other stand's complementing thymine. Guanine,
+on the other hand, has three hydrogen bonds with the other strand's
+complementing cytosine[1].
+
+A: Adenine
+T: Thymine
+G: Guanine
+C: Cytosine
+
+Each DNA strand has a certain direction (known as the 3prime or 5prime end,
+usually written as 3' or 5')[2]. These directions have important biological
+consequences: DNA polymerase can only synthesize DNA in the 5' to 3' direction,
+while oligos can only be chemically synthesized in the 3' to 5' direction. The
+double helix's complementing DNA strands run in opposite directions to each
+other. For example, look at the following DNA sequence:
+
+5' A T G C 3'
+3' T A C G 5'
+
+DNA, when read as a string on a computer, is always in the 5' to 3' direction.
+That means the two strands producing the above DNA sequence are "ATGC" and
+"GCAT". When a function makes a "reverse complement" of a strand, it means
+converting from an input of ATGC to an output of GCAT. Reverse complementing
+is important in simulating how enzymes and other strands will interact with
+a DNA strand of interest.
+
+Finally, there are certain occassions where we need have "degenerate" base
+pairs, which are string representations of different possible base pairs[3].
+There are many of them, but the most common are:
+
+N (any): A, T, G, C
+W (weak): A, T
+S (strong): G, C
+
+This particular module implements a single function to get the reverse
+complement of a DNA sequence.
+
+References:
+[1] https://en.wikipedia.org/wiki/DNA
+[2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
+[3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
+
+]]-----------------------------------------------------------------------------
+local record complement
+	COMPLEMENTS: {string:string}
+  reverse_complement: function(string): string
+end
+
+--- complement.COMPLEMENTS are DNA base complements.
+-- @table COMPLEMENTS
+complement.COMPLEMENTS = {
+	A = "T",
+	B = "V",
+	C = "G",
+	D = "H",
+	G = "C",
+	H = "D",
+	K = "M",
+	M = "K",
+	N = "N",
+	R = "Y",
+	S = "S",
+	T = "A",
+	U = "A",
+	V = "B",
+	W = "W",
+	Y = "R",
+}
+for k, v in pairs(complement.COMPLEMENTS) do
+	complement.COMPLEMENTS[k:lower()] = v:lower()
+end
+
+--- Returns reverse complement of a sequence, returns empty string if unknown character.
+-- @param sequence the sequence to reverse complement
+-- @return the reverse complement
+-- @usage local s = complement.reverse_complement("ATGC")
+function complement.reverse_complement(sequence: string): string
+  sequence = sequence:upper()
+	local s: string = ""
+	for i = 1, #sequence do
+    local base = sequence:sub(i,i)
+		if complement.COMPLEMENTS[base] == nil then error("unknown base pair: " .. base) end
+		s = s .. complement.COMPLEMENTS[base]
+	end
+	return s:reverse()
 end
 
 --[[---------------------------------------------------------------------------
@@ -2699,6 +2699,228 @@ util.uuid = function(): string
 end
 
 
+local record inventory
+   
+  record Sample
+    id: string
+    mixture: mixtures.Mixture
+  end
+  new_sample: function(mixtures.Mixture): Sample
+  record Tube
+    id: string
+    name: string
+    datamatrix: string
+    address: integer
+    capped: boolean
+    sample: Sample
+  end
+  record NewTube
+    name: string
+    datamatrix: string
+    address: integer
+    capped: boolean
+    mixture: mixtures.Mixture
+  end
+
+  record Plate
+    id: string
+    name: string
+    labware: Labware
+    tubes: {Tube}
+
+    new_tube: function(Plate, NewTube)
+    new_well: function(Plate, NewTube)
+  end
+  record NewPlate
+    name: string
+    labware: Labware
+  end
+  new_plate: function(NewPlate): Plate
+
+  record NewTipbox
+    labware: Labware
+  end
+  new_tipbox: function(NewTipbox | string): Plate
+
+  address_to_integer: {string: integer}
+  integer_to_address: {integer: string}
+
+  enum Labware
+    "agilent_1_reservoir_290ml"
+    "axygen_1_reservoir_90ml"
+    "biorad_96_wellplate_200ul_pcr"
+    "corning_12_wellplate_6.9ml_flat"
+    "corning_24_wellplate_3.4ml_flat"
+    "corning_384_wellplate_112ul_flat"
+    "corning_48_wellplate_1.6ml_flat"
+    "corning_6_wellplate_16.8ml_flat"
+    "corning_96_wellplate_360ul_flat"
+    "eppendorf_96_tiprack_1000ul_eptips"
+    "eppendorf_96_tiprack_10ul_eptips"
+    "geb_96_tiprack_1000ul"
+    "geb_96_tiprack_10ul"
+    "nest_12_reservoir_15ml"
+    "nest_1_reservoir_195ml"
+    "nest_96_wellplate_100ul_pcr_full_skirt"
+    "nest_96_wellplate_200ul_flat"
+    "nest_96_wellplate_2ml_deep"
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic"
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"
+    "opentrons_15_tuberack_falcon_15ml_conical"
+    "opentrons_15_tuberack_nest_15ml_conical"
+    "opentrons_1_trash_1100ml_fixed"
+    "opentrons_1_trash_850ml_fixed"
+    "opentrons_24_aluminumblock_generic_2ml_screwcap"
+    "opentrons_24_aluminumblock_nest_0.5ml_screwcap"
+    "opentrons_24_aluminumblock_nest_1.5ml_screwcap"
+    "opentrons_24_aluminumblock_nest_1.5ml_snapcap"
+    "opentrons_24_aluminumblock_nest_2ml_screwcap"
+    "opentrons_24_aluminumblock_nest_2ml_snapcap"
+    "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap"
+    "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap"
+    "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic"
+    "opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic"
+    "opentrons_24_tuberack_generic_2ml_screwcap"
+    "opentrons_24_tuberack_nest_0.5ml_screwcap"
+    "opentrons_24_tuberack_nest_1.5ml_screwcap"
+    "opentrons_24_tuberack_nest_1.5ml_snapcap"
+    "opentrons_24_tuberack_nest_2ml_screwcap"
+    "opentrons_24_tuberack_nest_2ml_snapcap"
+    "opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip"
+    "opentrons_6_tuberack_falcon_50ml_conical"
+    "opentrons_6_tuberack_nest_50ml_conical"
+    "opentrons_96_aluminumblock_biorad_wellplate_200ul"
+    "opentrons_96_aluminumblock_generic_pcr_strip_200ul"
+    "opentrons_96_aluminumblock_nest_wellplate_100ul"
+    "opentrons_96_filtertiprack_1000ul"
+    "opentrons_96_filtertiprack_10ul"
+    "opentrons_96_filtertiprack_200ul"
+    "opentrons_96_filtertiprack_20ul"
+    "opentrons_96_tiprack_1000ul"
+    "opentrons_96_tiprack_10ul"
+    "opentrons_96_tiprack_20ul"
+    "opentrons_96_tiprack_300ul"
+    "opentrons_calibrationblock_short_side_left"
+    "opentrons_calibrationblock_short_side_right"
+    "tipone_96_tiprack_200ul"
+    "usascientific_12_reservoir_22ml"
+    "usascientific_96_wellplate_2.4ml_deep"
+    "agilent_1_reservoir_290ml"
+    "axygen_1_reservoir_90ml"
+    "biorad_96_wellplate_200ul_pcr"
+    "corning_12_wellplate_6.9ml_flat"
+    "corning_24_wellplate_3.4ml_flat"
+    "corning_384_wellplate_112ul_flat"
+    "corning_48_wellplate_1.6ml_flat"
+    "corning_6_wellplate_16.8ml_flat"
+    "corning_96_wellplate_360ul_flat"
+    "eppendorf_96_tiprack_1000ul_eptips"
+    "eppendorf_96_tiprack_10ul_eptips"
+    "geb_96_tiprack_1000ul"
+    "geb_96_tiprack_10ul"
+    "nest_12_reservoir_15ml"
+    "nest_1_reservoir_195ml"
+    "nest_96_wellplate_100ul_pcr_full_skirt"
+    "nest_96_wellplate_200ul_flat"
+    "nest_96_wellplate_2ml_deep"
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic"
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"
+    "opentrons_15_tuberack_falcon_15ml_conical"
+    "opentrons_15_tuberack_nest_15ml_conical"
+    "opentrons_1_trash_1100ml_fixed"
+    "opentrons_1_trash_850ml_fixed"
+    "opentrons_24_aluminumblock_generic_2ml_screwcap"
+    "opentrons_24_aluminumblock_nest_0.5ml_screwcap"
+    "opentrons_24_aluminumblock_nest_1.5ml_screwcap"
+    "opentrons_24_aluminumblock_nest_1.5ml_snapcap"
+    "opentrons_24_aluminumblock_nest_2ml_screwcap"
+    "opentrons_24_aluminumblock_nest_2ml_snapcap"
+    "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap"
+    "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap"
+    "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic"
+    "opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic"
+    "opentrons_24_tuberack_generic_2ml_screwcap"
+    "opentrons_24_tuberack_nest_0.5ml_screwcap"
+    "opentrons_24_tuberack_nest_1.5ml_screwcap"
+    "opentrons_24_tuberack_nest_1.5ml_snapcap"
+    "opentrons_24_tuberack_nest_2ml_screwcap"
+    "opentrons_24_tuberack_nest_2ml_snapcap"
+    "opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip"
+    "opentrons_6_tuberack_falcon_50ml_conical"
+    "opentrons_6_tuberack_nest_50ml_conical"
+    "opentrons_96_aluminumblock_biorad_wellplate_200ul"
+    "opentrons_96_aluminumblock_generic_pcr_strip_200ul"
+    "opentrons_96_aluminumblock_nest_wellplate_100ul"
+    "opentrons_96_filtertiprack_1000ul"
+    "opentrons_96_filtertiprack_10ul"
+    "opentrons_96_filtertiprack_200ul"
+    "opentrons_96_filtertiprack_20ul"
+    "opentrons_96_tiprack_1000ul"
+    "opentrons_96_tiprack_10ul"
+    "opentrons_96_tiprack_20ul"
+    "opentrons_96_tiprack_300ul"
+    "opentrons_calibrationblock_short_side_left"
+    "opentrons_calibrationblock_short_side_right"
+    "tipone_96_tiprack_200ul"
+    "usascientific_12_reservoir_22ml"
+    "usascientific_96_wellplate_2.4ml_deep"
+
+    "cryoking_300ul"
+  end
+end
+
+inventory.new_sample = function(mixture: mixtures.Mixture): inventory.Sample
+  return {id = util.uuid(), mixture = mixture} as inventory.Sample
+end
+
+local function new_tube(self: inventory.Plate, new_tube_tbl: inventory.NewTube)
+  local tube: inventory.Tube = {}
+  tube.id = util.uuid()
+  tube.name = new_tube_tbl.name
+  tube.sample = inventory.new_sample(new_tube_tbl.mixture)
+  tube.datamatrix = new_tube_tbl.datamatrix
+  tube.capped = new_tube_tbl.capped
+  tube.address = new_tube_tbl.address
+  self.tubes[#self.tubes+1] = tube
+end
+
+inventory.new_plate = function(new_plate_tbl: inventory.NewPlate): inventory.Plate
+  local plate: inventory.Plate = {}
+  plate.id = util.uuid()
+  plate.name = new_plate_tbl.name
+  plate.labware = new_plate_tbl.labware
+  plate.tubes = {}
+
+  plate.new_tube = new_tube
+  plate.new_well = new_tube
+  return plate
+end
+
+inventory.new_tipbox = function(labware_input: inventory.NewTipbox | string): inventory.Plate
+  local plate: inventory.Plate = {}
+  local labware: inventory.Labware
+  if labware_input is string then
+    labware = labware_input as inventory.Labware
+  else
+    labware = labware_input.labware
+  end
+  plate.id = util.uuid()
+  plate.name = labware
+  plate.labware = labware
+  plate.tubes = {}
+  for i=1,96 do
+    local tube: inventory.Tube = {}
+    tube.id = util.uuid()
+    tube.name = "tip"
+    tube.address = i-1
+    plate.tubes[i] = tube
+  end
+  return plate
+end
+
+
 --[[---------------------------------------------------------------------------
 
                           Protocol functions
@@ -2708,6 +2930,7 @@ end
 local record biologic_commands
   -- BiologicCommands
   record Mix
+    samples: {inventory.Sample}
     mixture: mixtures.Mixture
   end
   record BiologicCommand
@@ -2718,26 +2941,26 @@ local record biologic_commands
     biologic_commands: {BiologicCommand}
     name: string
     append: function(BiologicCommands, BiologicCommand)
-    to_json: function(BiologicCommands): string
   end
   new_protocol: function(string): BiologicCommands
-  new_mix_command: function(mixtures.Mixture): BiologicCommand
+  mix: function(Mix): BiologicCommand
 
 end
 
+global protocol: biologic_commands.BiologicCommands = {name = "untitled_protocol", biologic_commands = {}}
+
 biologic_commands.new_protocol = function(name: string): biologic_commands.BiologicCommands
-  local protocol: biologic_commands.BiologicCommands = {name = name, biologic_commands = {}}
+  global protocol: biologic_commands.BiologicCommands = {name = name, biologic_commands = {}}
   protocol.append = function(self: biologic_commands.BiologicCommands, command: biologic_commands.BiologicCommand)
     self.biologic_commands[#self.biologic_commands+1] = command
-  end
-  protocol.to_json = function(self:biologic_commands.BiologicCommands): string 
-    return json.encode(self)
   end
   return protocol
 end
 
-biologic_commands.new_mix_command = function(mixture: mixtures.Mixture): biologic_commands.BiologicCommand
-  return {biologic_command_type = 1, mix = {mixture = mixture} as biologic_commands.Mix} as biologic_commands.BiologicCommand
+biologic_commands.mix = function(mix:biologic_commands.Mix): biologic_commands.BiologicCommand
+  local command = {biologic_command_type = 1, mix = mix as biologic_commands.Mix} as biologic_commands.BiologicCommand
+  protocol.biologic_commands[#protocol.biologic_commands+1] = command
+  return command
 end
 
 
@@ -2747,6 +2970,8 @@ local record std
   mixtures: mixtures
   util: util
   biologic_commands: biologic_commands
+  inventory: inventory
+  json: json
   synbio: synbio
 end
 
@@ -2755,6 +2980,8 @@ std.conversions = conversions
 std.mixtures = mixtures
 std.util = util
 std.biologic_commands = biologic_commands
+std.inventory = inventory
+std.json = json
 std.synbio = synbio
 
 return std

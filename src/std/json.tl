@@ -87,7 +87,7 @@ local function encode_number(val:number): string
   if val ~= val or val <= -math.huge or val >= math.huge then
     error("unexpected number value '" .. tostring(val) .. "'")
   end
-  return string.format("%.14g", val)
+  return string.format("%.18g", val) -- 53 bit significand precision gives 15-17 significant digits. We do 18 to be safe.
 end
 
 
