@@ -368,10 +368,10 @@ has two hydrogen bonds with the other stand's complementing thymine. Guanine,
 on the other hand, has three hydrogen bonds with the other strand's
 complementing cytosine[1].
 
-A: Adenine
-T: Thymine
-G: Guanine
-C: Cytosine
+ A: Adenine
+ T: Thymine
+ G: Guanine
+ C: Cytosine
 
 Each DNA strand has a certain direction (known as the 3prime or 5prime end,
 usually written as 3' or 5')[2]. These directions have important biological
@@ -380,8 +380,8 @@ while oligos can only be chemically synthesized in the 3' to 5' direction. The
 double helix's complementing DNA strands run in opposite directions to each
 other. For example, look at the following DNA sequence:
 
-5' A T G C 3'
-3' T A C G 5'
+ 5' A T G C 3'
+ 3' T A C G 5'
 
 DNA, when read as a string on a computer, is always in the 5' to 3' direction.
 That means the two strands producing the above DNA sequence are "ATGC" and
@@ -394,14 +394,15 @@ Finally, there are certain occassions where we need have "degenerate" base
 pairs, which are string representations of different possible base pairs[3].
 There are many of them, but the most common are:
 
-N (any): A, T, G, C
-W (weak): A, T
-S (strong): G, C
+ N (any): A, T, G, C
+ W (weak): A, T
+ S (strong): G, C
 
 This particular module implements a single function to get the reverse
 complement of a DNA sequence.
 
-References:
+
+=== References ===
 [1] https://en.wikipedia.org/wiki/DNA
 [2] https://en.wikipedia.org/wiki/Directionality_(molecular_biology)
 [3] https://en.wikipedia.org/wiki/Nucleic_acid_notation
@@ -456,8 +457,38 @@ This module provides a parser for working with FASTA formatted genetic
 sequences.
 
 FASTA is a flat text file format developed in 1985 to store nucleotide and
-amino acid sequences. It is extremely simple and well-supported across many
-languages.
+amino acid sequences. It is extremely simple and a nearly universal standard
+in the field of bioinformatics.
+
+Each entry in a FASTA file has a header or identifier line which begins with
+'>', followed by sequence data. By convention, lines are a maximum of 80
+characters (since when FASTA was developed, many DEC VT220 terminals could only
+display 80 characters). In the original description of the format, there may be
+semicolon lines denoting comments and empty lines for readability, but this has
+largely fallen out of practice, with the official National Center for
+Biotechnology Information (NCBI)'s FASTA definition[1] not allowing either.
+
+Though not a part of the official format, often additional data is separated
+by '|', similar to how commas are used in CSV files for data entry.
+
+
+=== Example FASTA file ===
+```
+ >MCHU - Calmodulin - Human, rabbit, bovine, rat, and chicken
+ MADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTID
+ FPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREA
+ DIDGDGQVNYEEFVQMMTAK*
+ >gi|5524211|gb|AAD44166.1| cytochrome b [Elephas maximus maximus]
+ LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
+ EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
+ LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
+ GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
+ IENY
+```
+
+
+=== References===
+[1] https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp
 --]]---------------------------------------------------------------------------
 local record fasta
     record Fasta
@@ -471,10 +502,12 @@ end
 -- @return a list of FASTA tables, each containing an identifier and a sequence.
 -- @usage local fastas = fasta.parse(">test\natgtaa")
 function fasta.parse(input: string): {fasta.Fasta}
+    -- Initiate basic variables
     local output: {fasta.Fasta} = {}
     local identifier: string = ""
     local sequence: string = ""
     local start:boolean = true
+
     for line in string.gmatch(input, '[^\r\n]+') do
         local s: string = line:sub(1,1)
         -- Process identifier lines
@@ -484,6 +517,7 @@ function fasta.parse(input: string): {fasta.Fasta}
                 identifier = line:sub(2,-1)
                 start = false
             else
+                -- This hits when it is the end of one entry and the start of the next
                 output[#output+1] = {identifier = identifier, sequence = sequence}
                 identifier = ""
                 sequence = ""
@@ -493,7 +527,7 @@ function fasta.parse(input: string): {fasta.Fasta}
             sequence = sequence .. line:gsub("%s+", "") -- Remove whitespace from sequence
         end
     end
-    -- final output
+    -- Final output
     output[#output+1] = {identifier = identifier, sequence = sequence}
     return output
 end
@@ -503,7 +537,35 @@ This module provides a parser for working with FASTQ formatted sequencing
 files.
 
 FASTQ is a flat file format developed by the Wellcome Trust Sanger Institute in
-~2000 to store sequencing data along with quality data.
+~2000 to store sequencing data. It is the standard in bioinformatics for
+storing sequencing data.
+
+The primary difference between FASTA and FASTQ files
+
+FASTQ files contain many sequencing entries, each representing a single "read"
+off of the sequencer - whether this be a single molecule, or several molecules
+of nominally the same sequence. Each entry has 4 lines, which are not broken
+by any newlines for formatting. The 4 entry lines are:
+ 1. '@' followed by a sequence identifier and other information
+ 2. Sequence data
+ 3. '+' (usually with nothing else)
+ 4. Quality value scores of the sequencing data
+
+Quality, from lowest quality to highest quality, is represented between 0x21
+(! in ASCII) and 0x7e (~ in ASCII). This quality is arbitrary per sequencer
+device. Acceptable quality values:
+ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmn
+ opqrstuvwxyz{|}~
+
+
+== Example FASTQ entry ===
+```
+ @SEQ_ID
+ GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAATCCATTTGTTCAACTCACAGTTT
+ +
+ !''*((((***+))%%%++)(%%%%).1***-+*''))**55CCF>>>>>>CCCCCCC65
+```
+
 --]]---------------------------------------------------------------------------
 local record fastq
     record Fastq
@@ -518,12 +580,14 @@ end
 -- @return a list of FASTQ tables, each containing an identifier, a sequence, and a quality score.
 -- @usage local fastqs = fastq.parse("@SEQ_ID\nATGTAA\n+\n!''*%+")
 function fastq.parse(input: string): {fastq.Fastq}
+    -- Initiate basic variables
     local output: {fastq.Fastq} = {}
     local identifier: string = ""
     local sequence: string = ""
     local quality: string = ""
     local quality_next:boolean = false
     local start:boolean = true
+
     for line in string.gmatch(input, '[^\r\n]+') do
         local s: string = line:sub(1,1)
         -- Process identifier lines
@@ -533,6 +597,7 @@ function fastq.parse(input: string): {fastq.Fastq}
                 identifier = line:sub(2,-1)
                 start = false
             else
+                -- This hits when it is the end of one entry and the start of the next
                 output[#output+1] = {identifier = identifier, sequence = sequence, quality = quality}
                 identifier = ""
                 sequence = ""
@@ -540,19 +605,22 @@ function fastq.parse(input: string): {fastq.Fastq}
             end
         -- Process sequence lines
         elseif s ~= "@" then
-            if quality_next == true then
-                quality = line
-                quality_next = false
-            else
+            if quality_next == false then
                 if s == "+" then
+                    -- Quality always follows +
                     quality_next = true
                 else
+                    -- If not quality line or +, must be sequence
                     sequence = sequence .. line:gsub("%s+", "") -- Remove whitespace from sequence
                 end
+            else
+                -- If quality_next, then set quality
+                quality = line
+                quality_next = false
             end
         end
     end
-    -- final output
+    -- Final output
     output[#output+1] = {identifier = identifier, sequence = sequence, quality = quality}
     return output
 end
@@ -827,7 +895,7 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
       local full_primer_forward = primer_list[forward_primer_index]
       for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
         local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
-        local pcr_fragment: string = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f,r) .. full_primer_reverse
+        local pcr_fragment: string = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f,r-1) .. full_primer_reverse
         gen_pcr_fragments[#gen_pcr_fragments+1] = pcr_fragment
       end
     end
@@ -906,9 +974,6 @@ function pcr.simulate_simple(templates: {pcr.Template}, primer_list: {string}, t
             for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
               pcr_fragments[#pcr_fragments+1] = fragment
             end
-              for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[  reverse_match_start])) do
-                pcr_fragments[#pcr_fragments+1] = fragment
-              end
             break
           end
         end
@@ -963,6 +1028,8 @@ sequences.
 GenBank is a flat text file format developed in the 1980s to annotate genetic
 sequences, and has since become the standard for sharing annotated genetic
 sequences.
+
+
 --]]---------------------------------------------------------------------------
 
 local record genbank
@@ -1721,7 +1788,8 @@ fragment.fragment_sequence = function(sequence: string, min_length: integer, max
     local offset = 0
     while offset <= max_len-min_len do
       -- We go from max -> min so that we maximize the size of our fragments
-      local overhang_position = (max_len - offset) as integer
+      local overhang_position = math.floor(max_len - offset)
+
       local overhang_to_test = s:sub(overhang_position-3, overhang_position)
 
       -- Check to make this overhang doesn't already exist
@@ -1757,6 +1825,267 @@ fragment.fragment_sequence = function(sequence: string, min_length: integer, max
   end
 
   return optimize_overhang_iteration(sequence, min_length, max_length, {}, {})
+end
+
+--[[---------------------------------------------------------------------------
+Module rebase contains a rebase parser for rebase data dump #31.
+
+=== Introduction ===
+In 1970, Hamilton O. Smith, Thomas Kelly and Kent Wilcox discovered an enzyme
+from Haemophilus influenzae that recognized and cut at a specific sequence of
+DNA. These enzymes, known as Type II restriction enzymes (as opposed to Type I,
+which cut randomly away from where recognize), were studied for their potential
+in genetic manipulation. For example, EcoRI, a Type II restriction enzyme, cuts
+the following DNA sequence:
+
+ GAATTC + EcoRI = G    AATTC
+ CTTAAG           CTTAA    G
+
+In this case, the sequence "GAATTC" is split in two, with a "AATT" overhang.
+If there is another sequence with an "AATT" overhang, you can glue the
+sequences together using an enzyme called ligase:
+
+ G     + AATTCGGTCTC + ligase = GAATTCGGTCTC
+ CTTAA       GCCAGAG            CTTAAGCCAGAG
+
+It was quickly realized that if you cut two different sequences with the same
+restriction enzyme, you could combine them together using ligase into novel
+sequences. This ushered in the age of "recombinant DNA" technology. This was
+and still is the most popular way of creating recombinant DNA, though there a
+newer method called Gibson Assembly has recently been growing in popularity.
+
+
+=== REBASE ===
+Thousands of restriction enzymes have been discovered. In order to use them
+in software, we have to know the sequence each one recognizes and how it cuts
+that sequence. All of this data is stored in the REBASE database, an amazing
+resource run by New England Biolabs listing almost every known restriction
+enzyme and how they cut. This parser parses data dump format #31[1], which is
+what Bioperl uses[2]. It is updated monthly[3].
+
+The header of this file gives a wonderful explanation of its structure. Below
+"References" is the September 2022 data dump header with a single entry.
+
+The REBASE parser is used during the build process to parse certain popular
+enzymes, not the entire REBASE database, into the bioscript amalgamation.
+
+
+=== References ===
+[1] http://rebase.neb.com/rebase/rebase.f31.html
+[2] https://bioperl.org/howtos/Restriction_Enzyme_Analysis_HOWTO.html
+[3] http://rebase.neb.com/rebase/link_withrefm
+
+```
+ 
+REBASE version 210                                              withrefm.210
+ 
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    REBASE, The Restriction Enzyme Database   http://rebase.neb.com
+    Copyright (c)  Dr. Richard J. Roberts, 2022.   All rights reserved.
+    =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ 
+Rich Roberts                                                    Sep 28 2022
+ 
+
+<ENZYME NAME>   Restriction enzyme name.
+<ISOSCHIZOMERS> Other enzymes with this specificity.
+<RECOGNITION SEQUENCE> 
+                These are written from 5' to 3', only one strand being given.
+                If the point of cleavage has been determined, the precise site
+                is marked with ^.  For enzymes such as HgaI, MboII etc., which
+                cleave away from their recognition sequence the cleavage sites
+                are indicated in parentheses.  
+
+                For example HgaI GACGC (5/10) indicates cleavage as follows:
+                                5' GACGCNNNNN^      3'
+                                3' CTGCGNNNNNNNNNN^ 5'
+
+                In all cases the recognition sequences are oriented so that
+                the cleavage sites lie on their 3' side.
+
+                REBASE Recognition sequences representations use the standard 
+                abbreviations (Eur. J. Biochem. 150: 1-5, 1985) to represent 
+                ambiguity.
+                                R = G or A
+                                Y = C or T
+                                M = A or C
+                                K = G or T
+                                S = G or C
+                                W = A or T
+                                B = not A (C or G or T)
+                                D = not C (A or G or T)
+                                H = not G (A or C or T)
+                                V = not T (A or C or G)
+                                N = A or C or G or T
+
+
+
+                ENZYMES WITH UNUSUAL CLEAVAGE PROPERTIES:  
+
+                Enzymes that cut on both sides of their recognition sequences,
+                such as BcgI, Bsp24I, CjeI and CjePI, have 4 cleavage sites
+                each instead of 2.
+
+                Bsp24I
+                          5'      ^NNNNNNNNGACNNNNNNTGGNNNNNNNNNNNN^   3'
+                          3' ^NNNNNNNNNNNNNCTGNNNNNNACCNNNNNNN^        5'
+
+
+                This will be described in some REBASE reports as:
+
+                             Bsp24I (8/13)GACNNNNNNTGG(12/7)
+
+<METHYLATION SITE>
+                The site of methylation by the cognate methylase when known
+                is indicated X(Y) or X,X2(Y,Y2), where X is the base within
+                the recognition sequence that is modified.  A negative number
+                indicates the complementary strand, numbered from the 5' base 
+                of that strand, and Y is the specific type of methylation 
+                involved:
+                               (6) = N6-methyladenosine 
+                               (5) = 5-methylcytosine 
+                               (4) = N4-methylcytosine
+
+                If the methylation information is different for the 3' strand,
+                X2 and Y2 are given as well.
+
+<MICROORGANISM> Organism from which this enzyme had been isolated.
+<SOURCE>        Either an individual or a National Culture Collection.
+<COMMERCIAL AVAILABILITY>
+                Each commercial source of restriction enzymes and/or methylases
+                listed in REBASE is assigned a single character abbreviation 
+                code.  For example:
+
+                K        Takara (1/98)
+                M        Boehringer Mannheim (10/97)
+                N        New England Biolabs (4/98)
+ 
+                The date in parentheses indicates the most recent update of 
+                that organization's listings in REBASE.
+
+<REFERENCES>only the primary references for the isolation and/or purification
+of the restriction enzyme or methylase, the determination of the recognition
+sequence and cleavage site or the methylation specificity are given.
+
+
+REBASE codes for commercial sources of enzymes
+
+                B        Thermo Fisher Scientific (7/22)
+                C        Minotech Biotechnology (1/22)
+                E        Agilent Technologies (8/20)
+                I        SibEnzyme Ltd. (12/21)
+                J        Nippon Gene Co., Ltd. (7/22)
+                K        Takara Bio Inc. (3/22)
+                M        Roche Applied Science (9/21)
+                N        New England Biolabs (7/22)
+                O        Toyobo Biochemicals (8/14)
+                Q        Molecular Biology Resources - CHIMERx (7/22)
+                R        Promega Corporation (11/20)
+                S        Sigma Chemical Corporation (5/21)
+                V        Vivantis Technologies (1/18)
+                X        EURx Ltd. (7/22)
+                Y        SinaClon BioScience Co. (1/18)
+
+<1>AaaI
+<2>XmaIII,BseX3I,BsoDI,BstZI,EagI,EclXI,Eco52I,SenPT16I,TauII,Tsp504I
+<3>C^GGCCG
+<4>
+<5>Acetobacter aceti ss aceti
+<6>M. Fukaya
+<7>
+<8>Tagami, H., Tayama, K., Tohyama, T., Fukaya, M., Okumura, H., Kawamura, Y., Horinouchi, S., Beppu, T., (1988) FEMS Microbiol. Lett., vol. 56, pp. 161-166.
+```
+
+--]]---------------------------------------------------------------------------
+
+local record rebase
+    record RestrictionEnzyme
+        name: string
+        isoschizomers: {string} -- other enzymes with the same recognition and cut site
+        recognition_sequence: string
+        methylation_site: string
+        microorganism: string
+        source: string
+        commercial_availability: {string}
+        references: {string}
+    end
+    parse: function(string): {string: RestrictionEnzyme}
+end
+
+function rebase.parse(input: string): {string: rebase.RestrictionEnzyme}
+    local enzymes: {string: rebase.RestrictionEnzyme} = {}
+    local enzyme: rebase.RestrictionEnzyme = {isoschizomers = {}, commercial_availability = {}, references = {}}
+
+    local commercial_suppliers: {string: string} = {}
+    local start_commercial_parsing: boolean = false
+    local commercial_parsing_line: integer = 0
+
+    local first_enzyme = true
+
+    for line in string.gmatch(input, '[^\r\n]+') do
+        -- Parse commercial sources
+        if line == "REBASE codes for commercial sources of enzymes" then
+            start_commercial_parsing = true
+        end
+        if start_commercial_parsing then
+            -- If enzyme parsing has started, break the commercial supplier parsing
+            if line:find("<1>") then
+                start_commercial_parsing = false
+                commercial_parsing_line = 0
+            end
+
+            commercial_parsing_line = commercial_parsing_line + 1
+            local stripped_line = line:gsub('^%s*(.-)%s*$', '%1')
+            if (commercial_parsing_line > 3) and (stripped_line:len() > 0) then
+                -- The first letter of the stripped_line is the single letter code
+                local commercial_code_letter = stripped_line:sub(1,1)
+                -- There are 8 spaces until the commercial companies's name. We
+                -- also remove the date parathesis, and then strip the line
+                -- once again.
+                local commercial_name = stripped_line:sub(9,-1):gsub('%b()', ''):gsub('^%s*(.-)%s*$', '%1')
+
+                commercial_suppliers[commercial_code_letter] = commercial_name
+            end
+        end
+
+        -- Normal enzyme parsing
+        local str = line:sub(4,-1)
+        if line:find("<1>") then
+            if first_enzyme == true then
+              first_enzyme = false
+            else
+              -- put the current enzyme into enzymeMap and setup a new enzyme
+              enzymes[enzyme.name] = enzyme
+              enzyme = {isoschizomers = {}, commercial_availability = {}, references = {}}
+            end
+            enzyme.name = str
+        elseif line:find("<2>") then
+            for isoschizomer in str:gmatch('([^,]+)') do
+                enzyme.isoschizomers[#enzyme.isoschizomers+1] = isoschizomer
+            end
+        elseif line:find("<3>") then
+            enzyme.recognition_sequence = str
+        elseif line:find("<4>") then
+            enzyme.methylation_site = str
+        elseif line:find("<5>") then
+            enzyme.microorganism = str
+        elseif line:find("<6>") then
+            enzyme.source = str
+        elseif line:find("<7>") then
+            -- we need to get a list of specific commercial suppliers from the
+            -- commerical_suppliers table
+            for idx = 1, #str do
+                enzyme.commercial_availability[#enzyme.commercial_availability+1] = commercial_suppliers[str:sub(idx,idx)]
+            end
+        elseif line:find("<8>") then
+          enzyme.references[#enzyme.references+1] = str
+        else
+          enzyme.references[#enzyme.references+1] = line
+        end
+    end
+    -- Final enzyme
+    enzymes[enzyme.name] = enzyme
+    return enzymes
 end
 
 --[[---------------------------------------------------------------------------
@@ -1943,6 +2272,7 @@ local record synbio
     genbank: genbank
     codon: codon
     fragment: fragment
+    rebase: rebase
     json: json
 end
 
@@ -1955,6 +2285,7 @@ synbio.pcr = pcr
 synbio.genbank = genbank
 synbio.codon = codon
 synbio.fragment = fragment
+synbio.rebase = rebase
 synbio.json = json
 
 --[[---------------------------------------------------------------------------

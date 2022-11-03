@@ -1068,8 +1068,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   120 for k, v in pairs(complement.COMPLEMENTS) do
-   345    complement.COMPLEMENTS[k:lower()] = v:lower()
+   115 for k, v in pairs(complement.COMPLEMENTS) do
+   330    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -1275,7 +1275,7 @@ test/synbio/fastq.lua
 ==============================================================================
 test/synbio/fragment.lua
 ==============================================================================
-     1 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local string = _tl_compat and _tl_compat.string or string
+     1 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; local string = _tl_compat and _tl_compat.string or string
 
 
 
@@ -1438,7 +1438,8 @@ test/synbio/fragment.lua
     11       local offset = 0
    242       while offset <= max_len - min_len do
 
-   231          local overhang_position = (max_len - offset)
+   231          local overhang_position = math.floor(max_len - offset)
+
    231          local overhang_to_test = s:sub(overhang_position - 3, overhang_position)
 
 
@@ -2140,11 +2141,11 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-     8       for k in pairs(val) do
-     6          if type(k) ~= "number" then
+     9       for k in pairs(val) do
+     7          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
-     5          n = n + 1
+     6          n = n + 1
              end
      2       if n ~= #val then
      1          error("invalid table: sparse array")
@@ -2158,13 +2159,13 @@ test/synbio/json.lua
 
           else
 
-     9       for k, v in pairs(val) do
-     8          if type(k) ~= "string" then
+     8       for k, v in pairs(val) do
+     7          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
-     4          local stack_value = encode(v, stack)
-     4          if stack_value ~= nil then
-    12             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+     3          local stack_value = encode(v, stack)
+     3          if stack_value ~= nil then
+     9             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
                 end
              end
      1       stack[val] = nil
@@ -2173,16 +2174,16 @@ test/synbio/json.lua
        end
 
        local function encode_string(val)
-    18    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+    17    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
        end
 
 
        local function encode_number(val)
 
-    17    if val ~= val or val <= -math.huge or val >= math.huge then
+    15    if val ~= val or val <= -math.huge or val >= math.huge then
      3       error("unexpected number value '" .. tostring(val) .. "'")
           end
-    14    return string.format("%.14g", val)
+    12    return string.format("%.14g", val)
        end
 
 
@@ -2195,10 +2196,10 @@ test/synbio/json.lua
        }
 
        encode = function(val, stack)
-    46    local t = type(val)
-    46    local f = type_func_map[t]
-    46    if f then
-    46       return f(val, stack)
+    43    local t = type(val)
+    43    local f = type_func_map[t]
+    43    if f then
+    43       return f(val, stack)
           end
 *****0    if t ~= "function" then
 *****0       error("unexpected type '" .. t .. "'")

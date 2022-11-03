@@ -161,7 +161,8 @@ fragment.fragment_sequence = function(sequence: string, min_length: integer, max
     local offset = 0
     while offset <= max_len-min_len do
       -- We go from max -> min so that we maximize the size of our fragments
-      local overhang_position = (max_len - offset) as integer
+      local overhang_position = math.floor(max_len - offset)
+
       local overhang_to_test = s:sub(overhang_position-3, overhang_position)
 
       -- Check to make this overhang doesn't already exist

@@ -407,6 +407,7 @@ end
 
 
 
+
 local complement = {}
 
 
@@ -459,6 +460,36 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 local fasta = {Fasta = {}, }
 
 
@@ -471,10 +502,12 @@ local fasta = {Fasta = {}, }
 
 
 function fasta.parse(input)
+
    local output = {}
    local identifier = ""
    local sequence = ""
    local start = true
+
    for line in string.gmatch(input, '[^\r\n]+') do
       local s = line:sub(1, 1)
 
@@ -484,6 +517,7 @@ function fasta.parse(input)
             identifier = line:sub(2, -1)
             start = false
          else
+
             output[#output + 1] = { identifier = identifier, sequence = sequence }
             identifier = ""
             sequence = ""
@@ -505,6 +539,34 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 local fastq = {Fastq = {}, }
 
 
@@ -518,12 +580,14 @@ local fastq = {Fastq = {}, }
 
 
 function fastq.parse(input)
+
    local output = {}
    local identifier = ""
    local sequence = ""
    local quality = ""
    local quality_next = false
    local start = true
+
    for line in string.gmatch(input, '[^\r\n]+') do
       local s = line:sub(1, 1)
 
@@ -533,6 +597,7 @@ function fastq.parse(input)
             identifier = line:sub(2, -1)
             start = false
          else
+
             output[#output + 1] = { identifier = identifier, sequence = sequence, quality = quality }
             identifier = ""
             sequence = ""
@@ -540,15 +605,18 @@ function fastq.parse(input)
          end
 
       elseif s ~= "@" then
-         if quality_next == true then
-            quality = line
-            quality_next = false
-         else
+         if quality_next == false then
             if s == "+" then
+
                quality_next = true
             else
+
                sequence = sequence .. line:gsub("%s+", "")
             end
+         else
+
+            quality = line
+            quality_next = false
          end
       end
    end
@@ -827,7 +895,7 @@ function pcr.simulate_simple(templates, primer_list, target_tm, options)
          local full_primer_forward = primer_list[forward_primer_index]
          for _, reverse_primer_index in ipairs(reverse_primer_indexes) do
             local full_primer_reverse = complement.reverse_complement(primer_list[reverse_primer_index])
-            local pcr_fragment = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f, r) .. full_primer_reverse
+            local pcr_fragment = full_primer_forward:sub(1, #full_primer_forward - #minimal_primer) .. s:sub(f, r - 1) .. full_primer_reverse
             gen_pcr_fragments[#gen_pcr_fragments + 1] = pcr_fragment
          end
       end
@@ -906,9 +974,6 @@ function pcr.simulate_simple(templates, primer_list, target_tm, options)
                   for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
                      pcr_fragments[#pcr_fragments + 1] = fragment
                   end
-                  for _, fragment in ipairs(generate_pcr_fragments(template, forward_match_start, reverse_match_start, forward_locations_inverted[forward_match_start], reverse_locations_inverted[reverse_match_start])) do
-                     pcr_fragments[#pcr_fragments + 1] = fragment
-                  end
                   break
                end
             end
@@ -955,6 +1020,8 @@ function pcr.simulate(templates, primer_list, target_tm, options)
    if #initial_amplification ~= #subsequent_amplification then error("concatemerization detected in PCR.") end
    return initial_amplification
 end
+
+
 
 
 
@@ -1721,7 +1788,8 @@ fragment.fragment_sequence = function(sequence, min_length, max_length)
       local offset = 0
       while offset <= max_len - min_len do
 
-         local overhang_position = (max_len - offset)
+         local overhang_position = math.floor(max_len - offset)
+
          local overhang_to_test = s:sub(overhang_position - 3, overhang_position)
 
 
@@ -1757,6 +1825,267 @@ fragment.fragment_sequence = function(sequence, min_length, max_length)
    end
 
    return optimize_overhang_iteration(sequence, min_length, max_length, {}, {})
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local rebase = {RestrictionEnzyme = {}, }
+
+
+
+
+
+
+
+
+
+
+
+
+
+function rebase.parse(input)
+   local enzymes = {}
+   local enzyme = { isoschizomers = {}, commercial_availability = {}, references = {} }
+
+   local commercial_suppliers = {}
+   local start_commercial_parsing = false
+   local commercial_parsing_line = 0
+
+   local first_enzyme = true
+
+   for line in string.gmatch(input, '[^\r\n]+') do
+
+      if line == "REBASE codes for commercial sources of enzymes" then
+         start_commercial_parsing = true
+      end
+      if start_commercial_parsing then
+
+         if line:find("<1>") then
+            start_commercial_parsing = false
+            commercial_parsing_line = 0
+         end
+
+         commercial_parsing_line = commercial_parsing_line + 1
+         local stripped_line = line:gsub('^%s*(.-)%s*$', '%1')
+         if (commercial_parsing_line > 3) and (stripped_line:len() > 0) then
+
+            local commercial_code_letter = stripped_line:sub(1, 1)
+
+
+
+            local commercial_name = stripped_line:sub(9, -1):gsub('%b()', ''):gsub('^%s*(.-)%s*$', '%1')
+
+            commercial_suppliers[commercial_code_letter] = commercial_name
+         end
+      end
+
+
+      local str = line:sub(4, -1)
+      if line:find("<1>") then
+         if first_enzyme == true then
+            first_enzyme = false
+         else
+
+            enzymes[enzyme.name] = enzyme
+            enzyme = { isoschizomers = {}, commercial_availability = {}, references = {} }
+         end
+         enzyme.name = str
+      elseif line:find("<2>") then
+         for isoschizomer in str:gmatch('([^,]+)') do
+            enzyme.isoschizomers[#enzyme.isoschizomers + 1] = isoschizomer
+         end
+      elseif line:find("<3>") then
+         enzyme.recognition_sequence = str
+      elseif line:find("<4>") then
+         enzyme.methylation_site = str
+      elseif line:find("<5>") then
+         enzyme.microorganism = str
+      elseif line:find("<6>") then
+         enzyme.source = str
+      elseif line:find("<7>") then
+
+
+         for idx = 1, #str do
+            enzyme.commercial_availability[#enzyme.commercial_availability + 1] = commercial_suppliers[str:sub(idx, idx)]
+         end
+      elseif line:find("<8>") then
+         enzyme.references[#enzyme.references + 1] = str
+      else
+         enzyme.references[#enzyme.references + 1] = line
+      end
+   end
+
+   enzymes[enzyme.name] = enzyme
+   return enzymes
 end
 
 
@@ -1946,6 +2275,7 @@ local synbio = {}
 
 
 
+
 synbio.version = "0.0.1"
 synbio.complement = complement
 synbio.fasta = fasta
@@ -1955,6 +2285,7 @@ synbio.pcr = pcr
 synbio.genbank = genbank
 synbio.codon = codon
 synbio.fragment = fragment
+synbio.rebase = rebase
 synbio.json = json
 
 
