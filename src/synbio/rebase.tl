@@ -5,9 +5,9 @@ Module rebase contains a rebase parser for rebase data dump #31.
 In 1970, Hamilton O. Smith, Thomas Kelly and Kent Wilcox discovered an enzyme
 from Haemophilus influenzae that recognized and cut at a specific sequence of
 DNA. These enzymes, known as Type II restriction enzymes (as opposed to Type I,
-which cut randomly away from where recognize), were studied for their potential
-in genetic manipulation. For example, EcoRI, a Type II restriction enzyme, cuts
-the following DNA sequence:
+which cut randomly away from where they recognize), were studied for their
+potential in genetic manipulation. For example, EcoRI, a Type II restriction
+enzyme, cuts the following DNA sequence:
 
  GAATTC + EcoRI = G    AATTC
  CTTAAG           CTTAA    G
