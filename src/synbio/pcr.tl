@@ -34,8 +34,8 @@ local complement = require("complement")
 
 local record pcr
   minimal_primer_length: integer
-  design_primers_with_overhang: function(string, string, string, number): string, string
-  design_primers: function(string, number): string, string
+  design_primers_with_overhang: function(string, string, string, string, number): string, string
+  design_primers: function(string, string, number): string, string
   record Template
     sequence: string
     circular: boolean
@@ -56,7 +56,10 @@ pcr.minimal_primer_length = 12
 -- on either side. These overhangs are important when designing PCRs whose
 -- products are intended to be used in downstream applications, like DNA
 -- assembly.
-function pcr.design_primers_with_overhang(template: string, forward_overhang: string, reverse_overhang: string, target_tm: number, options: pcr.Options): string, string
+function pcr.design_primers_with_overhang(template: string, polymerase: string, forward_overhang: string, reverse_overhang: string, target_tm: number, options: pcr.Options): string, string
+  if polymerase ~= "taq_standard" then
+    error("Got unknown polymerase")
+  end
   template = template:upper()
 
   -- If options are nil, fill default options
@@ -91,8 +94,8 @@ end
 --- pcr.design_primers designs PCR primers without overhangs. Primers like
 -- these are often used in diagnostic or testing settings where the output
 -- of the PCR needs to be analyzed, but not used for downstream reactions.
-function pcr.design_primers(template: string, target_tm: number, options: pcr.Options): string, string
-  return pcr.design_primers_with_overhang(template, "", "", target_tm, options)
+function pcr.design_primers(template: string, polymerase: string, target_tm: number, options: pcr.Options): string, string
+  return pcr.design_primers_with_overhang(template, polymerase, "", "", target_tm, options)
 end
 
 --- pcr.simulate_simple simulates a single step in a PCR reaction. Whenever

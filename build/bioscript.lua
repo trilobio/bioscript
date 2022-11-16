@@ -810,7 +810,10 @@ pcr.minimal_primer_length = 12
 
 
 
-function pcr.design_primers_with_overhang(template, forward_overhang, reverse_overhang, target_tm, options)
+function pcr.design_primers_with_overhang(template, polymerase, forward_overhang, reverse_overhang, target_tm, options)
+   if polymerase ~= "taq_standard" then
+      error("Got unknown polymerase")
+   end
    template = template:upper()
 
 
@@ -844,8 +847,8 @@ end
 
 
 
-function pcr.design_primers(template, target_tm, options)
-   return pcr.design_primers_with_overhang(template, "", "", target_tm, options)
+function pcr.design_primers(template, polymerase, target_tm, options)
+   return pcr.design_primers_with_overhang(template, polymerase, "", "", target_tm, options)
 end
 
 
