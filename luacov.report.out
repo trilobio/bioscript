@@ -1068,8 +1068,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   115 for k, v in pairs(complement.COMPLEMENTS) do
-   330    complement.COMPLEMENTS[k:lower()] = v:lower()
+   140 for k, v in pairs(complement.COMPLEMENTS) do
+   405    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -2517,7 +2517,10 @@ test/synbio/pcr.lua
 
 
 
-     1 function pcr.design_primers_with_overhang(template, forward_overhang, reverse_overhang, target_tm, options)
+     1 function pcr.design_primers_with_overhang(template, polymerase, forward_overhang, reverse_overhang, target_tm, options)
+     2    if polymerase ~= "taq_standard" then
+*****0       error("Got unknown polymerase")
+          end
      4    template = template:upper()
 
 
@@ -2552,8 +2555,8 @@ test/synbio/pcr.lua
 
 
 
-     1 function pcr.design_primers(template, target_tm, options)
-     1    return pcr.design_primers_with_overhang(template, "", "", target_tm, options)
+     1 function pcr.design_primers(template, polymerase, target_tm, options)
+     1    return pcr.design_primers_with_overhang(template, polymerase, "", "", target_tm, options)
        end
 
 
@@ -3150,8 +3153,8 @@ test/synbio/fastq.lua      29   0      100.00%
 test/synbio/fragment.lua   65   30     68.42%
 test/synbio/genbank.lua    232  57     80.28%
 test/synbio/json.lua       187  9      95.41%
-test/synbio/pcr.lua        125  0      100.00%
+test/synbio/pcr.lua        126  1      99.21%
 test/synbio/primers.lua    62   0      100.00%
 test/synbio/rebase.lua     49   0      100.00%
 -----------------------------------------------
-Total                      1071 154    87.43%
+Total                      1072 155    87.37%

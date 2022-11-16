@@ -10,9 +10,7 @@ local record mixtures
   end
   chemical_mt: metatable<Chemical>
   record Sequence
-      seqhash: string
       sequence: string
-      molecule_type: string
       dna: boolean
       double_stranded: boolean
       circular: boolean
@@ -342,6 +340,7 @@ local chemicals: {string: mixtures.Chemical} = {
     FeCl3 = {inchi = "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3"},
     glucose = {inchi = "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1"},
     H3BO3 = {inchi = "InChI=1S/BH3O3/c2-1(3)4/h2-4H"},
+    KCl = {inchi = "InChI=1S/ClH.K/h1H;/q;+1/p-1"},
     KH2PO4 = {inchi = "InChI=1S/K.H3O4P/c;1-5(2,3)4/h;(H3,1,2,3,4)/q+1;/p-1"},
     MgSO4 = {inchi = "InChI=1S/Mg.H2O4S/c;1-5(2,3)4/h;(H2,1,2,3,4)/q+2;/p-2"},
     MgCl2 = {inchi = "InChI=1S/2ClH.Mg/h2*1H;/q;;+2/p-2"},
@@ -379,6 +378,18 @@ local chemicals: {string: mixtures.Chemical} = {
     valine = {inchi = "InChI=1S/C5H11NO2/c1-3(2)4(6)5(7)8/h3-4H,6H2,1-2H3,(H,7,8)/t4-/m0/s1"},
     selenocysteine = {inchi = "InChI=1S/C3H6NO2Se/c4-2(1-7)3(5)6/h2H,1,4H2,(H,5,6)/t2-/m0/s1"},
     pyrrolysine = {inchi = "InChI=1S/C12H21N3O3/c1-8-5-7-14-10(8)11(16)15-6-3-2-4-9(13)12(17)18/h7-10H,2-6,13H2,1H3,(H,15,16)(H,17,18)/t8-,9+,10-/m1/s1"},
+
+    -- Nucleic acids. The below match https://www.thermofisher.com/us/en/home/references/ambion-tech-support/rna-tools-and-calculators/dna-and-rna-molecular-weights-and-conversions.html
+    dAMP = {inchi = "InChI=1S/C10H14N5O6P/c11-9-8-10(13-3-12-9)15(4-14-8)7-1-5(16)6(21-7)2-20-22(17,18)19/h3-7,16H,1-2H2,(H2,11,12,13)(H2,17,18,19)/t5-,6+,7+/m0/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/2_-Deoxyadenosine-5_-monophosphate
+    dTMP = {inchi = "InChI=1S/C10H15N2O8P/c1-5-3-12(10(15)11-9(5)14)8-2-6(13)7(20-8)4-19-21(16,17)18/h3,6-8,13H,2,4H2,1H3,(H,11,14,15)(H2,16,17,18)/t6-,7+,8+/m0/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/Thymidine-5_-phosphate
+    dGMP = {inchi = "InChI=1S/C10H14N5O7P/c11-10-13-8-7(9(17)14-10)12-3-15(8)6-1-4(16)5(22-6)2-21-23(18,19)20/h3-6,16H,1-2H2,(H2,18,19,20)(H3,11,13,14,17)/t4-,5+,6+/m0/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/2_-Deoxyguanosine-5_-monophosphate
+    dCMP = {inchi = "InChI=1S/C9H14N3O7P/c10-7-1-2-12(9(14)11-7)8-3-5(13)6(19-8)4-18-20(15,16)17/h1-2,5-6,8,13H,3-4H2,(H2,10,11,14)(H2,15,16,17)/t5-,6+,8+/m0/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/2_-Deoxycytidine-5_-monophosphate
+
+    AMP = {inchi = "InChI=1S/C10H14N5O7P/c11-8-5-9(13-2-12-8)15(3-14-5)10-7(17)6(16)4(22-10)1-21-23(18,19)20/h2-4,6-7,10,16-17H,1H2,(H2,11,12,13)(H2,18,19,20)/t4-,6-,7-,10-/m1/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/AMP
+    UMP = {inchi = "InChI=1S/C9H13N2O9P/c12-5-1-2-11(9(15)10-5)8-7(14)6(13)4(20-8)3-19-21(16,17)18/h1-2,4,6-8,13-14H,3H2,(H,10,12,15)(H2,16,17,18)/t4-,6-,7-,8-/m1/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/UMP
+    GMP = {inchi = "InChI=1S/C10H14N5O8P/c11-10-13-7-4(8(18)14-10)12-2-15(7)9-6(17)5(16)3(23-9)1-22-24(19,20)21/h2-3,5-6,9,16-17H,1H2,(H2,19,20,21)(H3,11,13,14,18)/t3-,5-,6-,9-/m1/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/GMP
+    CMP = {inchi = "InChI=1S/C9H14N3O8P/c10-5-1-2-12(9(15)11-5)8-7(14)6(13)4(20-8)3-19-21(16,17)18/h1-2,4,6-8,13-14H,3H2,(H2,10,11,15)(H2,16,17,18)/t4-,6-,7-,8-/m1/s1"}, -- https://pubchem.ncbi.nlm.nih.gov/compound/CMP
+
 }
 
 local function formula(self: mixtures.Chemical): string
@@ -419,12 +430,23 @@ mixtures.amino_acid_weights = {
 
 --[[---------------------------------------------------------------------------
 
+                          Sequences
+
+---------------------------------------------------------------------------]]--
+
+local seqeunces : {string: mixtures.Sequence} = {
+  M13_forward = {sequence = "GTAAAACGACGGCCAG", dna = true, double_stranded = false, circular = false}
+}
+
+--[[---------------------------------------------------------------------------
+
                           Proteins 
 
 ---------------------------------------------------------------------------]]--
 
 local proteins: {string: mixtures.Protein} = {
-  human_serum_albumin = {sequence = "MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPFEDHVKLVNEVTEFAKTCVADESAENCDKSLHTLFGDKLCTVATLRETYGEMADCCAKQEPERNECFLQHKDDNPNLPRLVRPEVDVMCTAFHDNEETFLKKYLYEIARRHPYFYAPELLFFAKRYKAAFTECCQAADKAACLLPKLDELRDEGKASSAKQRLKCASLQKFGERAFKAWAVARLSQRFPKAEFAEVSKLVTDLTKVHTECCHGDLLECADDRADLAKYICENQDSISSKLKECCEKPLLEKSHCIAEVENDEMPADLPSLAADFVESKDVCKNYAEAKDVFLGMFLYEYARRHPDYSVVLLLRLAKTYETTLEKCCAAADPHECYAKVFDEFKPLVEEPQNLIKQNCELFEQLGEYKFQNALLVRYTKKVPQVSTPTLVEVSRNLGKVGSKCCKHPEAKRMPCAEDYLSVVLNQLCVLHEKTPVSDRVTKCCTESLVNRRPCFSALEVDETYVPKEFNAETFTFHADICTLSEKERQIKKQTALVELVKHKPKATKEQLKAVMDDFAAFVEKCCKADDKETCFAEEGKKLVAASQAALGL"}
+  human_serum_albumin = {sequence = "MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPFEDHVKLVNEVTEFAKTCVADESAENCDKSLHTLFGDKLCTVATLRETYGEMADCCAKQEPERNECFLQHKDDNPNLPRLVRPEVDVMCTAFHDNEETFLKKYLYEIARRHPYFYAPELLFFAKRYKAAFTECCQAADKAACLLPKLDELRDEGKASSAKQRLKCASLQKFGERAFKAWAVARLSQRFPKAEFAEVSKLVTDLTKVHTECCHGDLLECADDRADLAKYICENQDSISSKLKECCEKPLLEKSHCIAEVENDEMPADLPSLAADFVESKDVCKNYAEAKDVFLGMFLYEYARRHPDYSVVLLLRLAKTYETTLEKCCAAADPHECYAKVFDEFKPLVEEPQNLIKQNCELFEQLGEYKFQNALLVRYTKKVPQVSTPTLVEVSRNLGKVGSKCCKHPEAKRMPCAEDYLSVVLNQLCVLHEKTPVSDRVTKCCTESLVNRRPCFSALEVDETYVPKEFNAETFTFHADICTLSEKERQIKKQTALVELVKHKPKATKEQLKAVMDDFAAFVEKCCKADDKETCFAEEGKKLVAASQAALGL"},
+  taq = {sequence = "MRGMLPLFEPKGRVLLVDGHHLAYRTFHALKGLTTSRGEPVQAVYGFAKSLLKALKEDGDAVIVVFDAKAPSFRHEAYGGYKAGRAPTPEDFPRQLALIKELVDLLGLARLEVPGYEADDVLASLAKKAEKEGYEVRILTADKDLYQLLSDRIHVLHPEGYLITPAWLWEKYGLRPDQWADYRALTGDESDNLPGVKGIGEKTARKLLEEWGSLEALLKNLDRLKPAIREKILAHMDDLKLSWDLAKVRTDLPLEVDFAKRREPDRERLRAFLERLEFGSLLHEFGLLESPKALEEAPWPPPEGAFVGFVLSRKEPMWADLLALAAARGGRVHRAPEPYKALRDLKEARGLLAKDLSVLALREGLGLPPGDDPMLLAYLLDPSNTTPEGVARRYGGEWTEEAGERAALSERLFANLWGRLEGEERLLWLYREVERPLSAVLAHMEATGVRLDVAYLRALSLEVAEEIARLEAEVFRLAGHPFNLNSRDQLERVLFDELGLPAIGKTEKTGKRSTSAAVLEALREAHPIVEKILQYRELTKLKSTYIDPLPDLIHPRTGRLHTRFNQTATATGRLSSSDPNLQNIPVRTPLGQRIRRAFIAEEGWLLVALDYSQIELRVLAHLSGDENLIRVFQEGRDIHTETASWMFGVPREAVDPLMRRAAKTINFGVLYGMSAHRLSQELAIPYEEAQAFIERYFQSFPKVRAWIEKTLEEGRRRGYVETLFGRRRYVPDLEARVKSVREAAERMAFNMPVQGTAADLMKLAMVKLFPRLEEMGARMLLQVHDELVLEAPKERAEAVARLAKEVMEGVYPLAVPLEVEVGIGEDWLSAKE"} -- https://www.uniprot.org/uniprotkb/P19821/entry
 }
 mixtures.proteins = {}
 local function protein_to_mw(self: mixtures.Protein): number
@@ -487,13 +509,20 @@ local common_reagents: {string: mixtures.Mixture} = {
       (mixtures.chemicals.H3BO3 * 162 * conversions.umol) +
       (mixtures.chemicals.MnCl2 * 8.1 * conversions.umol)
     ) / 100), -- 100x trace elements
+    H2O = (mixtures.chemicals.H2O * conversions.l),
 
     -- NEBuffer r1.1, r2.1, r3.1, rCutsmart
     -- _u denotes nothing about the pH
     ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
       (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
       (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-      (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug))
+      (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug)),
+
+    ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
+      (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
+        (mixtures.chemicals.KCl * 50 * conversions.mmol) +
+        (mixtures.chemicals.MgCl2 * 1.5 * conversions.mmol)
+      ) * 10.0 ) -- 1X Standard Taq Reaction Buffer: 10 mM Tris-HCl, 50 mM KCl, and 1.5 mM MgCl2, pH 8.3 @ 25°C. Supplied as a 10X
 }
 mixtures.common_reagents = common_reagents
 
