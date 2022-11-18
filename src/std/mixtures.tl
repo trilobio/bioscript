@@ -72,6 +72,7 @@ local record mixtures
 
   -- Defaults
   chemicals: {string: Chemical}
+  print_all_chemicals: function()
   amino_acids: {string: Chemical}
   sequences: {string: Sequence}
   proteins: {string: Protein}
@@ -167,7 +168,7 @@ mixtures.mixture_mt = {
 			for _, sequenceMix in ipairs(t.sequences) do
         	    local found = false
         	    for i, tbl in ipairs(copy.sequences) do
-        	        if tbl.sequence.seqhash == sequenceMix.sequence.seqhash then
+        	        if tbl.sequence == sequenceMix.sequence then
         	            copy.sequences[i].quantity = copy.sequences[i].quantity + sequenceMix.quantity
         	            found = true
         	        end
@@ -428,15 +429,14 @@ mixtures.amino_acid_weights = {
   O = atoms.formula_to_mw(mixtures.chemicals.pyrrolysine:formula()),
 }
 
---[[---------------------------------------------------------------------------
-
-                          Sequences
-
----------------------------------------------------------------------------]]--
-
-local seqeunces : {string: mixtures.Sequence} = {
-  M13_forward = {sequence = "GTAAAACGACGGCCAG", dna = true, double_stranded = false, circular = false}
-}
+mixtures.print_all_chemicals = function()
+  local t: {string} = {}
+  for k, _ in pairs(mixtures.chemicals) do
+    t[#t+1] = k
+  end
+  table.sort(t, function(a:string,b:string):boolean return a:lower() < b:lower() end)
+  for _, v in ipairs(t) do print(v) end
+end
 
 --[[---------------------------------------------------------------------------
 

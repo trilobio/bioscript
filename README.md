@@ -1,5 +1,5 @@
 # Bioscript
-__code coverage: 87.37%__
+__code coverage: 87.18%__
 
 Bioscript is a synthetic biology language built for digital representation and physical execution of synthetic biology procedures.
 
