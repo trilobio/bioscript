@@ -36,10 +36,12 @@ local record biologic_commands
     name: string
     append: function(BiologicCommands, BiologicCommand)
     make_mixture: function(BiologicCommands, Mix)
+    simulate: function(BiologicCommands)
     pcr: function(BiologicCommands, PcrOptions)
   end
   biologic_comamnds_mt: metatable<BiologicCommands>
   make_mixture: function(BiologicCommands, Mix)
+  simulate: function(BiologicCommands)
   new_protocol: function(string): BiologicCommands
 
 end
@@ -83,12 +85,24 @@ biologic_commands.make_mixture = function(self: biologic_commands.BiologicComman
   return command
 end
 
+biologic_commands.simulate = function(self: biologic_commands.BiologicCommands)
+    print("Simulating protocol: " .. self.name)
+    for i, cmd in ipairs(self.biologic_commands) do
+        print("Step: " .. tostring(i))
+        print("  MakeMixture of following chemicals:")
+        for j, chemicalMix in ipairs(cmd.mix.mixture.chemicals) do
+            print("    ", j .. ". " .. tostring(chemicalMix.quantity) .. " molecules of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
+        end
+    end
+end
+
 biologic_commands.new_protocol = function(name: string): biologic_commands.BiologicCommands
   local protocol: biologic_commands.BiologicCommands = {name = name, biologic_commands = {}}
   protocol.append = function(self: biologic_commands.BiologicCommands, command: biologic_commands.BiologicCommand)
     self.biologic_commands[#self.biologic_commands+1] = command
   end
   protocol.make_mixture = biologic_commands.make_mixture
+  protocol.simulate = biologic_commands.simulate
   return protocol
 end
 

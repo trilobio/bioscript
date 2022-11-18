@@ -2608,6 +2608,7 @@ local mixtures = {Chemical = {}, Sequence = {}, Protein = {}, Cell = {}, Environ
 
 
 
+
 local function deepcopy(obj)
    if type(obj) ~= 'table' then return obj end
    local obj_table = obj
@@ -2945,6 +2946,11 @@ mixtures.amino_acid_weights = {
    U = atoms.formula_to_mw(mixtures.chemicals.selenocysteine:formula()),
    O = atoms.formula_to_mw(mixtures.chemicals.pyrrolysine:formula()),
 }
+
+mixtures.inchi_to_chemicals = {}
+for name, chem in pairs(mixtures.chemicals) do
+   mixtures.inchi_to_chemicals[chem.inchi] = name
+end
 
 mixtures.print_all_chemicals = function()
    local t = {}
@@ -3358,10 +3364,23 @@ local biologic_commands = {PcrOptions = {}, Sample = {}, Mix = {}, BiologicComma
 
 
 
+
+
 biologic_commands.make_mixture = function(self, mix)
    local command = { biologic_command_type = 1, mix = mix }
    self.biologic_commands[#self.biologic_commands + 1] = command
    return command
+end
+
+biologic_commands.simulate = function(self)
+   print("Simulating protocol: " .. self.name)
+   for i, cmd in ipairs(self.biologic_commands) do
+      print("Step: " .. tostring(i))
+      print("  MakeMixture of following chemicals:")
+      for j, chemicalMix in ipairs(cmd.mix.mixture.chemicals) do
+         print("    ", j .. ". " .. tostring(chemicalMix.quantity) .. " molecules of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
+      end
+   end
 end
 
 biologic_commands.new_protocol = function(name)
@@ -3370,6 +3389,7 @@ biologic_commands.new_protocol = function(name)
       self.biologic_commands[#self.biologic_commands + 1] = command
    end
    protocol.make_mixture = biologic_commands.make_mixture
+   protocol.simulate = biologic_commands.simulate
    return protocol
 end
 

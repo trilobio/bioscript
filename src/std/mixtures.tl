@@ -72,6 +72,7 @@ local record mixtures
 
   -- Defaults
   chemicals: {string: Chemical}
+  inchi_to_chemicals: {string: string}
   print_all_chemicals: function()
   amino_acids: {string: Chemical}
   sequences: {string: Sequence}
@@ -428,6 +429,11 @@ mixtures.amino_acid_weights = {
   U = atoms.formula_to_mw(mixtures.chemicals.selenocysteine:formula()),
   O = atoms.formula_to_mw(mixtures.chemicals.pyrrolysine:formula()),
 }
+
+mixtures.inchi_to_chemicals = {}
+for name, chem in pairs(mixtures.chemicals) do
+    mixtures.inchi_to_chemicals[chem.inchi] = name
+end
 
 mixtures.print_all_chemicals = function()
   local t: {string} = {}
