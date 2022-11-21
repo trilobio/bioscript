@@ -42,8 +42,7 @@ th {
   border: 1px dashed black;
   width: 200px;
   background-color: #f1f1f1;
-  overflow: auto;
-  margin-left: 300px;
+  margin-right: 100px;
 }
 
 /* Sidebar links */

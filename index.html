@@ -13,14 +13,12 @@
 
 <body>
 <div class="wrapper">
-	<!--
 <div class="sidebar">
   <a class="active" href="#bioscript">Bioscript</a>
   <a href="#protocols">Protocols</a>
   <a href="#mixtures">Mixtures</a>
   <a href="#repl">REPL</a>
 </div>
-	-->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/lua.min.js"></script>
@@ -56,11 +54,11 @@ hljs.highlightAll();
 <h2>Protocols</h2>
 <pre><code class="language-lua">protocol = new_protocol("make 1L of 1M CaCl2")
 
-water_1L = chemicals["H2O"] * 1 * L
-cacl2_1mol = chemicals["CaCl2"] * 1 * mol
-cacl2_1M = water_1L + cacl2_1mol
+water_one_L = chemicals["H2O"] * 1 * L
+cacl2_one_mol = chemicals["CaCl2"] * 1 * mol
+cacl2_one_M = water_one_L + cacl2_one_mol
 
-protocol:make_mixture{mixture=cacl2_1M}
+protocol:make_mixture{mixture=cacl2_one_M}
 protocol:simulate()</code></pre>
 <hr>
 </div>
@@ -75,6 +73,7 @@ protocol:simulate()</code></pre>
 
 <div id="repl">
 <h2>repl</h2>
+<p>Below is an in-browser bioscript read–eval–print loop (REPL). Click on it and play around!</p>
 
 <section class="section--standalone">
     <div class="repl">
