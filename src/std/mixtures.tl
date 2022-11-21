@@ -5,7 +5,7 @@ local record mixtures
   record Chemical
       inchi: string
       formula: function(Chemical): string
-      g_to_mol: function(Chemical, number): number
+      grams_to_molecules: function(Chemical, number): number
   metamethod __mul: function(Chemical, number): Mixture
   end
   chemical_mt: metatable<Chemical>
@@ -20,7 +20,7 @@ local record mixtures
   record Protein
       sequence: string
       protein_to_mw: function(Protein): number
-      g_to_mol: function(Protein, number): number
+      grams_to_molecules: function(Protein, number): number
       metamethod __mul: function(Protein, number): Mixture
   end
   protein_mt: metatable<Protein>
@@ -401,7 +401,7 @@ end
 mixtures.chemicals = {}
 for k, v in pairs(chemicals) do
   v.formula = formula
-  v.g_to_mol = function(self: mixtures.Chemical, n: number): number return conversions.g_to_mol(n, atoms.formula_to_mw(self:formula())) end
+  v.grams_to_molecules = function(self: mixtures.Chemical, n: number): number return conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula())) end
 	mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
 end
 
@@ -468,7 +468,7 @@ local function protein_to_mw(self: mixtures.Protein): number
 end
 
 for k, v in pairs(proteins) do
-  v.g_to_mol = function(self: mixtures.Protein, n: number): number return conversions.g_to_mol(n, protein_to_mw(self)) end
+  v.grams_to_molecules = function(self: mixtures.Protein, n: number): number return conversions.grams_to_molecules(n, protein_to_mw(self)) end
   mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
 end
 
@@ -499,9 +499,9 @@ local common_reagents: {string: mixtures.Mixture} = {
   M9 = (mixtures.chemicals.H2O * conversions.l) +
     (mixtures.chemicals.CaCl2 * 0.3 * conversions.mmol) +
     (mixtures.chemicals.MgSO4 * 1 * conversions.mmol) +
-    (mixtures.chemicals.biotin * conversions.g_to_mol(conversions.mg, 244.31)) + -- molecular weight 244.31g/mol, need 1mg.
-    (mixtures.chemicals.thiamin * conversions.g_to_mol(conversions.mg, 265.355)) + -- molecular weight 265.355g/mol, need 1mg
-    (mixtures.chemicals.glucose * conversions.g_to_mol(4*conversions.g, 180.156)) + -- molecular weight 180.156g/mol, need 4g
+    (mixtures.chemicals.biotin * conversions.grams_to_molecules(conversions.mg, 244.31)) + -- molecular weight 244.31g/mol, need 1mg.
+    (mixtures.chemicals.thiamin * conversions.grams_to_molecules(conversions.mg, 265.355)) + -- molecular weight 265.355g/mol, need 1mg
+    (mixtures.chemicals.glucose * conversions.grams_to_molecules(4*conversions.g, 180.156)) + -- molecular weight 180.156g/mol, need 4g
     (((mixtures.chemicals.Na2HPO4 * 337 * conversions.mmol) +
       (mixtures.chemicals.KH2PO4 * 220 * conversions.mmol) +
       (mixtures.chemicals.NaCl * 85.5 * conversions.mmol) +
@@ -522,7 +522,7 @@ local common_reagents: {string: mixtures.Mixture} = {
     ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
       (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
       (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-      (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug)),
+      (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
 
     ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
       (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +

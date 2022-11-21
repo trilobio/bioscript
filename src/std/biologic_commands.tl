@@ -1,5 +1,7 @@
 local inventory = require("inventory")
 local mixtures = require("mixtures")
+local conversions = require("conversions")
+local atoms = require("atoms")
 
 --[[---------------------------------------------------------------------------
 
@@ -86,14 +88,16 @@ biologic_commands.make_mixture = function(self: biologic_commands.BiologicComman
 end
 
 biologic_commands.simulate = function(self: biologic_commands.BiologicCommands)
-    print("Simulating protocol: " .. self.name)
-    for i, cmd in ipairs(self.biologic_commands) do
-        print("Step: " .. tostring(i))
-        print("  MakeMixture of following chemicals:")
-        for j, chemicalMix in ipairs(cmd.mix.mixture.chemicals) do
-            print("    ", j .. ". " .. tostring(chemicalMix.quantity) .. " molecules of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
-        end
+  print("Simulating protocol: " .. self.name)
+  for i, cmd in ipairs(self.biologic_commands) do
+    print("Step: " .. tostring(i))
+    print("  Make mixture of following chemicals:")
+    for j, chemicalMix in ipairs(cmd.mix.mixture.chemicals) do
+      local grams = conversions.molecules_to_grams(chemicalMix.quantity, atoms.formula_to_mw(mixtures.chemicals[mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi]]:formula()))
+
+      print("    ", j .. ". " .. tostring(grams) .. " grams of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
     end
+  end
 end
 
 biologic_commands.new_protocol = function(name: string): biologic_commands.BiologicCommands

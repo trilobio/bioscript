@@ -13,12 +13,14 @@
 
 <body>
 <div class="wrapper">
+	<!--
 <div class="sidebar">
   <a class="active" href="#bioscript">Bioscript</a>
   <a href="#protocols">Protocols</a>
   <a href="#mixtures">Mixtures</a>
   <a href="#repl">REPL</a>
 </div>
+	-->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/lua.min.js"></script>
@@ -47,18 +49,20 @@ hljs.highlightAll();
 <h3>Stable</h3>
 <p>Bioscript is built as a language from the ground-up with stability in mind. A bioscript written today should be able to run 10 years from now. This means we tightly control code environment of bioscript to ensure that protocols just <i>keep working</i>.
 <p>This allows users to be sure that biological experiments that run today will also run in the future.</p>
+<p><b>Note:</b> Bioscript will be stable in version 1.0.0. Beta will be unstable as we build out the system.</p>
 <hr>
 </div>
 
 <div id="protocols">
 <h2>Protocols</h2>
-<pre><code class="language-lua">protocol = new_protocol("make 1L of 1M CaCl2")
+<pre><code class="language-lua">protocol = new_protocol("make 50mL of 1M CaCl2")
 
-water_one_L = chemicals["H2O"] * 1 * L
-cacl2_one_mol = chemicals["CaCl2"] * 1 * mol
-cacl2_one_M = water_one_L + cacl2_one_mol
+water_one_L = chemicals["H2O"] * 1 * L		-- 1L H2O
+cacl2_one_mol = chemicals["CaCl2"] * 1 * mol	-- 1mol CaCl2
+cacl2_one_M = water_one_L + cacl2_one_mol	-- Add 1L water to 1mol CaCl2 
+cacl2_fifty_mL = cacl2_one_M:volume(50*mL) 	-- Make 50mL of 1M CaCl2
 
-protocol:make_mixture{mixture=cacl2_one_M}
+protocol:make_mixture{mixture=cacl2_fifty_mL}
 protocol:simulate()</code></pre>
 <hr>
 </div>
@@ -73,7 +77,8 @@ protocol:simulate()</code></pre>
 
 <div id="repl">
 <h2>repl</h2>
-<p>Below is an in-browser bioscript read–eval–print loop (REPL). Click on it and play around!</p>
+<p>Below is an in-browser bioscript read–eval–print loop (REPL). This REPL is an open local-only playground for you to learn how bioscript works. Click on it and play around!</p>
+<p>Hint: try to copy paste examples above to see what they do</p>
 
 <section class="section--standalone">
     <div class="repl">

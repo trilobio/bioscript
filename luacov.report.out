@@ -207,6 +207,7 @@ test/std/conversions.lua
 
 
 
+
      2 conversions.mol = 6.02214076 * (10 ^ 23)
      2 conversions.mmol = conversions.mol / 1000
      2 conversions.umol = conversions.mmol / 1000
@@ -228,8 +229,12 @@ test/std/conversions.lua
      2 conversions.pg = conversions.ng / 1000
      2 conversions.fg = conversions.pg / 1000
 
-     2 function conversions.g_to_mol(g, molecular_weight)
+     2 function conversions.grams_to_molecules(g, molecular_weight)
      8    return g / molecular_weight * conversions.mol
+       end
+
+     2 function conversions.molecules_to_grams(molecules, molecular_weight)
+*****0    return molecular_weight * (molecules / conversions.mol)
        end
 
      2 return conversions
@@ -564,7 +569,7 @@ test/std/mixtures.lua
   2783    if type(obj) ~= 'table' then return obj end
    528    local obj_table = obj
    528    local res = setmetatable({}, getmetatable(obj))
-  5064    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+  4536    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
    528    return res
        end
 
@@ -867,9 +872,9 @@ test/std/mixtures.lua
        end
 
      2 mixtures.chemicals = {}
-   108 for k, v in pairs(chemicals) do
+   106 for k, v in pairs(chemicals) do
    104    v.formula = formula
-   104    v.g_to_mol = function(self, n) return conversions.g_to_mol(n, atoms.formula_to_mw(self:formula())) end
+   104    v.grams_to_molecules = function(self, n) return conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula())) end
    104    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
        end
 
@@ -899,7 +904,7 @@ test/std/mixtures.lua
      2 }
 
      2 mixtures.inchi_to_chemicals = {}
-   108 for name, chem in pairs(mixtures.chemicals) do
+   106 for name, chem in pairs(mixtures.chemicals) do
    104    mixtures.inchi_to_chemicals[chem.inchi] = name
        end
 
@@ -935,8 +940,8 @@ test/std/mixtures.lua
      2    return mw
        end
 
-     8 for k, v in pairs(proteins) do
-     8    v.g_to_mol = function(self, n) return conversions.g_to_mol(n, protein_to_mw(self)) end
+     6 for k, v in pairs(proteins) do
+     8    v.grams_to_molecules = function(self, n) return conversions.grams_to_molecules(n, protein_to_mw(self)) end
      4    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
        end
 
@@ -951,7 +956,7 @@ test/std/mixtures.lua
      2    ["Escherichia coli MG1655"] = { name = "Escherichia coli MG1655" },
        }
      2 mixtures.cells = {}
-     6 for k, v in pairs(cells) do
+     4 for k, v in pairs(cells) do
      2    mixtures.cells[k] = setmetatable(v, mixtures.cell_mt)
        end
 
@@ -967,9 +972,9 @@ test/std/mixtures.lua
      2    M9 = (mixtures.chemicals.H2O * conversions.l) +
      6    (mixtures.chemicals.CaCl2 * 0.3 * conversions.mmol) +
      6    (mixtures.chemicals.MgSO4 * 1 * conversions.mmol) +
-     6    (mixtures.chemicals.biotin * conversions.g_to_mol(conversions.mg, 244.31)) +
-     6    (mixtures.chemicals.thiamin * conversions.g_to_mol(conversions.mg, 265.355)) +
-     6    (mixtures.chemicals.glucose * conversions.g_to_mol(4 * conversions.g, 180.156)) +
+     6    (mixtures.chemicals.biotin * conversions.grams_to_molecules(conversions.mg, 244.31)) +
+     6    (mixtures.chemicals.thiamin * conversions.grams_to_molecules(conversions.mg, 265.355)) +
+     6    (mixtures.chemicals.glucose * conversions.grams_to_molecules(4 * conversions.g, 180.156)) +
      4    (((mixtures.chemicals.Na2HPO4 * 337 * conversions.mmol) +
      6    (mixtures.chemicals.KH2PO4 * 220 * conversions.mmol) +
      6    (mixtures.chemicals.NaCl * 85.5 * conversions.mmol) +
@@ -990,7 +995,7 @@ test/std/mixtures.lua
      2    ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
      6    (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
      6    (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-     8    (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug)),
+     8    (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
 
      2    ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
      4    (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
@@ -1103,8 +1108,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   130 for k, v in pairs(complement.COMPLEMENTS) do
-   360    complement.COMPLEMENTS[k:lower()] = v:lower()
+   135 for k, v in pairs(complement.COMPLEMENTS) do
+   390    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -1656,7 +1661,7 @@ test/synbio/genbank.lua
    790       if type(obj) ~= 'table' then return obj end
    147       local obj_table = obj
    147       local res = setmetatable({}, getmetatable(obj))
-  1446       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+  1299       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
    147       return res
           end
 
@@ -2153,7 +2158,7 @@ test/synbio/json.lua
        }
 
      2 local escape_char_map_inv = { ["/"] = "/" }
-    18 for k, v in pairs(escape_char_map) do
+    16 for k, v in pairs(escape_char_map) do
     14    escape_char_map_inv[v] = k
        end
 
@@ -2176,7 +2181,7 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-    12       for k in pairs(val) do
+     9       for k in pairs(val) do
      7          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
@@ -2194,7 +2199,7 @@ test/synbio/json.lua
 
           else
 
-    13       for k, v in pairs(val) do
+     8       for k, v in pairs(val) do
      7          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
@@ -2694,14 +2699,14 @@ test/synbio/pcr.lua
     12       local forward_locations_indexes = {}
     12       local reverse_locations_inverted = {}
     12       local reverse_locations_indexes = {}
-    48       for idx, values in pairs(forward_locations) do
+    36       for idx, values in pairs(forward_locations) do
     72          for _, value in ipairs(values) do
     24             if forward_locations_inverted[value] == nil then forward_locations_inverted[value] = {} end
     24             forward_locations_inverted[value][#forward_locations_inverted[value] + 1] = idx
     24             forward_locations_indexes[#forward_locations_indexes + 1] = value
                 end
              end
-    44       for idx, values in pairs(reverse_locations) do
+    32       for idx, values in pairs(reverse_locations) do
     56          for _, value in ipairs(values) do
     16             if reverse_locations_inverted[value] == nil then reverse_locations_inverted[value] = {} end
     16             reverse_locations_inverted[value][#reverse_locations_inverted[value] + 1] = idx
@@ -2744,7 +2749,7 @@ test/synbio/pcr.lua
     13       fragment_set[fragment] = true
           end
     12    pcr_fragments = {}
-    37    for fragment, _ in pairs(fragment_set) do
+    25    for fragment, _ in pairs(fragment_set) do
     13       pcr_fragments[#pcr_fragments + 1] = fragment
           end
     12    return pcr_fragments
@@ -3178,7 +3183,7 @@ Summary
 File                       Hits Missed Coverage
 -----------------------------------------------
 test/std/atoms.lua         27   0      100.00%
-test/std/conversions.lua   22   0      100.00%
+test/std/conversions.lua   23   1      95.83%
 test/std/inventory.lua     36   0      100.00%
 test/std/mixtures.lua      213  63     77.17%
 test/std/util.lua          7    0      100.00%
@@ -3192,4 +3197,4 @@ test/synbio/pcr.lua        126  1      99.21%
 test/synbio/primers.lua    62   0      100.00%
 test/synbio/rebase.lua     49   0      100.00%
 -----------------------------------------------
-Total                      1091 160    87.21%
+Total                      1092 161    87.15%

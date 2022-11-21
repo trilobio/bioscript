@@ -2492,6 +2492,7 @@ local conversions = {}
 
 
 
+
 conversions.mol = 6.02214076 * (10 ^ 23)
 conversions.mmol = conversions.mol / 1000
 conversions.umol = conversions.mmol / 1000
@@ -2513,8 +2514,12 @@ conversions.ng = conversions.ug / 1000
 conversions.pg = conversions.ng / 1000
 conversions.fg = conversions.pg / 1000
 
-function conversions.g_to_mol(g, molecular_weight)
+function conversions.grams_to_molecules(g, molecular_weight)
    return g / molecular_weight * conversions.mol
+end
+
+function conversions.molecules_to_grams(molecules, molecular_weight)
+   return molecular_weight * (molecules / conversions.mol)
 end
 
 
@@ -2918,7 +2923,7 @@ end
 mixtures.chemicals = {}
 for k, v in pairs(chemicals) do
    v.formula = formula
-   v.g_to_mol = function(self, n) return conversions.g_to_mol(n, atoms.formula_to_mw(self:formula())) end
+   v.grams_to_molecules = function(self, n) return conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula())) end
    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
 end
 
@@ -2985,7 +2990,7 @@ local function protein_to_mw(self)
 end
 
 for k, v in pairs(proteins) do
-   v.g_to_mol = function(self, n) return conversions.g_to_mol(n, protein_to_mw(self)) end
+   v.grams_to_molecules = function(self, n) return conversions.grams_to_molecules(n, protein_to_mw(self)) end
    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
 end
 
@@ -3016,9 +3021,9 @@ local common_reagents = {
    M9 = (mixtures.chemicals.H2O * conversions.l) +
    (mixtures.chemicals.CaCl2 * 0.3 * conversions.mmol) +
    (mixtures.chemicals.MgSO4 * 1 * conversions.mmol) +
-   (mixtures.chemicals.biotin * conversions.g_to_mol(conversions.mg, 244.31)) +
-   (mixtures.chemicals.thiamin * conversions.g_to_mol(conversions.mg, 265.355)) +
-   (mixtures.chemicals.glucose * conversions.g_to_mol(4 * conversions.g, 180.156)) +
+   (mixtures.chemicals.biotin * conversions.grams_to_molecules(conversions.mg, 244.31)) +
+   (mixtures.chemicals.thiamin * conversions.grams_to_molecules(conversions.mg, 265.355)) +
+   (mixtures.chemicals.glucose * conversions.grams_to_molecules(4 * conversions.g, 180.156)) +
    (((mixtures.chemicals.Na2HPO4 * 337 * conversions.mmol) +
    (mixtures.chemicals.KH2PO4 * 220 * conversions.mmol) +
    (mixtures.chemicals.NaCl * 85.5 * conversions.mmol) +
@@ -3039,7 +3044,7 @@ local common_reagents = {
    ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
    (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
    (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-   (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug)),
+   (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
 
    ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
    (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
@@ -3376,9 +3381,11 @@ biologic_commands.simulate = function(self)
    print("Simulating protocol: " .. self.name)
    for i, cmd in ipairs(self.biologic_commands) do
       print("Step: " .. tostring(i))
-      print("  MakeMixture of following chemicals:")
+      print("  Make mixture of following chemicals:")
       for j, chemicalMix in ipairs(cmd.mix.mixture.chemicals) do
-         print("    ", j .. ". " .. tostring(chemicalMix.quantity) .. " molecules of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
+         local grams = conversions.molecules_to_grams(chemicalMix.quantity, atoms.formula_to_mw(mixtures.chemicals[mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi]]:formula()))
+
+         print("    ", j .. ". " .. tostring(grams) .. " grams of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
       end
    end
 end
