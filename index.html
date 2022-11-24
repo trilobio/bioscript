@@ -55,14 +55,15 @@ hljs.highlightAll();
 
 <div id="protocols">
 <h2>Protocols</h2>
-<pre><code class="language-lua">protocol = new_protocol("make 50mL of 1M CaCl2")
+<pre><code class="language-lua">protocol = new_protocol("make 50mL of 1M CaCl2 / 1M MgCl2")
 
 water_one_L = chemicals["H2O"] * 1 * L		-- 1L H2O
 cacl2_one_mol = chemicals["CaCl2"] * 1 * mol	-- 1mol CaCl2
-cacl2_one_M = water_one_L + cacl2_one_mol	-- Add 1L water to 1mol CaCl2 
-cacl2_fifty_mL = cacl2_one_M:volume(50*mL) 	-- Make 50mL of 1M CaCl2
+mgcl2_one_mol = chemicals["MgCl2"] * 1 * mol	-- 1mol MgCl2
+cacl2_mgcl2_one_M = water_one_L + cacl2_one_mol + mgcl2_one_mol	-- Add 1L water to 1mol CaCl2 and 1mol MgCl2
+fifty_mL = cacl2_mgcl2_one_M:volume(50*mL) 	-- Make 50mL of 1M CaCl2
 
-protocol:make_mixture{mixture=cacl2_fifty_mL}
+protocol:make_mixture{mixture=fifty_mL}
 protocol:simulate()</code></pre>
 <hr>
 </div>
@@ -96,6 +97,7 @@ std = require("build.bioscript")
 synbio = std.synbio
 
 chemicals = std.mixtures.chemicals
+common_reagents = std.mixtures.common_reagents
 print_all_chemicals = std.mixtures.print_all_chemicals
 
 new_protocol = std.biologic_commands.new_protocol
