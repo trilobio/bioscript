@@ -67,7 +67,7 @@ fifty_mL = cacl2_mgcl2_one_M:volume(50*mL) 	-- Make 50mL of 1M CaCl2 / MgCl2
 protocol:make_mixture{mixture=fifty_mL}
 protocol:simulate()</code></pre>
 
-<p>Complex premade mixtures, like <pre>M9</pre> media, are available as common_reagents. For example, to make a 100mL of M9 media.</p>
+<p>Complex premade mixtures, like M9 defined media, are available as common_reagents. For example, to make a 100mL of M9 media.</p>
 <pre><code class="language-lua">protocol = new_protocol("make 100mL of M9 media")
 
 m9_hundred_mL = common_reagents["M9"]:volume(100*mL)
