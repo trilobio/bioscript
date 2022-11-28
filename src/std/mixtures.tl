@@ -5,7 +5,7 @@ local record mixtures
   record Chemical
       inchi: string
       formula: function(Chemical): string
-      grams_to_molecules: function(Chemical, number): number
+      grams_to_molecules: function(Chemical, number): Mixture
   metamethod __mul: function(Chemical, number): Mixture
   end
   chemical_mt: metatable<Chemical>
@@ -20,7 +20,7 @@ local record mixtures
   record Protein
       sequence: string
       protein_to_mw: function(Protein): number
-      grams_to_molecules: function(Protein, number): number
+      grams_to_molecules: function(Protein, number): Mixture
       metamethod __mul: function(Protein, number): Mixture
   end
   protein_mt: metatable<Protein>
@@ -74,6 +74,7 @@ local record mixtures
   chemicals: {string: Chemical}
   inchi_to_chemicals: {string: string}
   print_all_chemicals: function()
+  print_all_common_reagents: function()
   amino_acids: {string: Chemical}
   sequences: {string: Sequence}
   proteins: {string: Protein}
@@ -401,7 +402,7 @@ end
 mixtures.chemicals = {}
 for k, v in pairs(chemicals) do
   v.formula = formula
-  v.grams_to_molecules = function(self: mixtures.Chemical, n: number): number return conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula())) end
+  v.grams_to_molecules = function(self: mixtures.Chemical, n: number): mixtures.Mixture return self * (conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula()))) end
 	mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
 end
 
@@ -468,7 +469,7 @@ local function protein_to_mw(self: mixtures.Protein): number
 end
 
 for k, v in pairs(proteins) do
-  v.grams_to_molecules = function(self: mixtures.Protein, n: number): number return conversions.grams_to_molecules(n, protein_to_mw(self)) end
+  v.grams_to_molecules = function(self: mixtures.Protein, n: number): mixtures.Mixture return self * (conversions.grams_to_molecules(n, protein_to_mw(self))) end
   mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
 end
 
@@ -522,7 +523,7 @@ local common_reagents: {string: mixtures.Mixture} = {
     ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
       (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
       (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-      (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
+      (mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
 
     ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
       (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
@@ -531,5 +532,14 @@ local common_reagents: {string: mixtures.Mixture} = {
       ) * 10.0 ) -- 1X Standard Taq Reaction Buffer: 10 mM Tris-HCl, 50 mM KCl, and 1.5 mM MgCl2, pH 8.3 @ 25°C. Supplied as a 10X
 }
 mixtures.common_reagents = common_reagents
+
+mixtures.print_all_common_reagents = function()
+  local t: {string} = {}
+  for k, _ in pairs(mixtures.common_reagents) do
+    t[#t+1] = k
+  end
+  table.sort(t, function(a:string,b:string):boolean return a:lower() < b:lower() end)
+  for _, v in ipairs(t) do print(v) end
+end
 
 return mixtures

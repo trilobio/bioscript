@@ -35,32 +35,3 @@ table, td {
 th {
     background: lightgray;
 }
-
-/* The side navigation menu */
-.sidebar {
-  position: fixed;
-  border: 1px dashed black;
-  width: 200px;
-  background-color: #f1f1f1;
-  margin-right: 100px;
-}
-
-/* Sidebar links */
-.sidebar a {
-  display: block;
-  color: black;
-  padding: 16px;
-  text-decoration: none;
-}
-
-/* Active/current link */
-.sidebar a.active {
-  background-color: #66fcf1;
-  color: black;
-}
-
-/* Links on mouse-over */
-.sidebar a:hover:not(.active) {
-  background-color: #bcd4e6;
-  color: black;
-}

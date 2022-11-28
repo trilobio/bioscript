@@ -13,15 +13,6 @@
 
 <body>
 <div class="wrapper">
-	<!--
-<div class="sidebar">
-  <a class="active" href="#bioscript">Bioscript</a>
-  <a href="#protocols">Protocols</a>
-  <a href="#mixtures">Mixtures</a>
-  <a href="#repl">REPL</a>
-</div>
-	-->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/lua.min.js"></script>
 <script>
@@ -54,7 +45,7 @@ hljs.highlightAll();
 </div>
 
 <div id="protocols">
-<h2>Protocols</h2>
+<h1>Protocols</h1>
 <p>Here is a simple example bioscript program, which would prompt a robotic system to make 50mL of a 1M CaCl2/MgCl2 solution.</p>
 <pre><code class="language-lua">protocol = new_protocol("make 50mL of 1M CaCl2 / 1M MgCl2")
 
@@ -65,21 +56,77 @@ cacl2_mgcl2_one_M = water_one_L + cacl2_one_mol + mgcl2_one_mol
 fifty_mL = cacl2_mgcl2_one_M:volume(50*mL) 	-- Make 50mL of 1M CaCl2 / MgCl2
 
 protocol:make_mixture{mixture=fifty_mL}
-protocol:simulate()</code></pre>
+--protocol:simulate() -- Run protocol:simulate() if you want to see what the protocol does
+return protocol</code></pre>
+<p>Protocols are a groupings of higher-level actions for a lab to accomplish.</p>
+<hr>
+</div>
 
-<p>Complex premade mixtures, like M9 defined media, are available as common_reagents. For example, to make a 100mL of M9 media.</p>
+<div id="mixtures">
+<h1>Mixtures</h1>
+<p>Mixtures are quantifiable collections of chemicals and are a core concept in programming bioscript. In bioscript, all mixtures must be <i>objectively defined</i>, meaning that all chemical inputs are known. However, bioscript does not know what format the chemicals in a lab exist in, whether that be powdered, 1M solution, or 10mM solution. The low-level robotic or human commands are compiled down from these higher-level mixture descriptions by the bioscript executor, which makes instructions like "aspirate 500uL from plate1 A1 to plate1 B1".</p>
+
+<h3>Mixture compilation</h3>
+<p>Mixture compilation optimizes which tubes are used. For example, if you are making a solution of 10mM CaCl2 + 10mM MgCl2, the bioscript executor should pull from a single 1M CaCl2 + 1M MgCl2 tube instead two individual 1M CaCl2 and 1M MgCl2 tubes. This becomes important for more complicated formulations, like buffers or defined media. As a bioscript developer, don't worry how exactly mixtures will be created - just use them as you need.</p>
+
+<h3>Real world example: M9 defined media</h3>
+<p>Here is a real-world example of defining a complicated mixture in bioscript. Here, we define M9 defined media according to a <a href="https://www.helmholtz-muenchen.de/fileadmin/PEPF/Protocols/M9-medium_150510.pdf">protocol made by Helmholtz Munich</a>. To follow along, make sure you are looking a the final concentrations for M9 in their publication.</p>
+<pre><code class="language-lua">protocol = new_protocol("make 1L of M9 media")
+
+m9_salts_final = (chemicals["Na2HPO4"] * 33.7 * mmol) + -- 33.7 mM Na2HPO4
+      (chemicals["KH2PO4"] * 22.0  * mmol) + -- 22.0 mM KH2PO4
+      (chemicals["NaCl"]   * 8.55  * mmol) + -- 8.55 mM NaCl
+      (chemicals["NH4Cl"]  * 9.35  * mmol)   -- 9.35 mM NH4Cl
+
+glucose_twenty_percent = chemicals["glucose"]:grams_to_molecules(4*g) -- 0.4% of 1000mL is 4g. Here, we convert grams to molecules
+mgcl2 = chemicals["MgCl2"] * 1 * mmol -- 1mM MgCl2
+cacl2 = chemicals["CaCl2"] * 0.3 * mmol -- 0.3 CaCl2
+biotin = chemicals["biotin"]:grams_to_molecules(1*ug) -- 1 μg biotin
+thiamin = chemicals["thiamin"]:grams_to_molecules(1*ug) -- 1 μg thiamin
+
+trace_elements_hundred_x = (chemicals["EDTA"] * 13.4 * mmol) + -- 13.4 mM EDTA
+      (chemicals["FeCl3"] * 3.1  * mmol) + -- 3.1  mM FeCl3
+      (chemicals["ZnCl2"] * 0.62 * mmol) + -- 0.62 mM ZnCl2
+      (chemicals["CuCl2"] * 76   * umol) + -- 76   μM CuCl2
+      (chemicals["CoCl2"] * 42   * umol) + -- 42   μM CoCl2
+      (chemicals["H3BO3"] * 162  * umol) + -- 162  μM H3BO3
+      (chemicals["MnCl2"] * 8.1  * umol)   -- 8.1  μM MnCl2
+
+
+-- Make M9
+m9 = (chemicals["H2O"] * 1 * L) + -- 1L of M9
+      m9_salts_final +
+      glucose_twenty_percent +
+      mgcl2 +
+      cacl2 +
+      biotin +
+      thiamin +
+      (trace_elements_hundred_x / 100) -- 1x trace elements
+
+protocol:make_mixture{mixture=m9}
+--protocol:simulate() -- Run protocol:simulate() if you want to see what the protocol does
+return protocol</code></pre>
+
+<h3>Help for complicated mixtures</h3>
+<p>Complex premade mixtures, like M9 defined media, are available as common_reagents. For example, here is how to make 100mL of M9 media without having to define M9 yourself.</p>
 <pre><code class="language-lua">protocol = new_protocol("make 100mL of M9 media")
 
 m9_hundred_mL = common_reagents["M9"]:volume(100*mL)
 
 protocol:make_mixture{mixture=m9_hundred_mL}
-protocol:simulate()</code></pre>
+--protocol:simulate()
+return protocol</code></pre>
+
+<h3>Useful defaults</h3>
+<p>To view default chemicals, use the code: <code class="language-lua">print_all_chemicals()</code></p>
+<p>To view default common reagents, use the code: <code class="language-lua">print_all_common_reagents()</code></p>
 <hr>
 </div>
 
-<div id="mixtures">
-<h2>Mixtures</h2>
-<p>To view default chemicals, use the code: <code class="language-lua">print_all_chemicals()</code></p>
+<div id="samples">
+<h1>Samples</h1>
+<p>Samples are specific instantiations of mixtures. They are used if you need to pipeline reactions.</p>
+
 <hr>
 </div>
 
@@ -108,6 +155,7 @@ synbio = std.synbio
 chemicals = std.mixtures.chemicals
 common_reagents = std.mixtures.common_reagents
 print_all_chemicals = std.mixtures.print_all_chemicals
+print_all_common_reagents = std.mixtures.print_all_common_reagents
 
 new_protocol = std.biologic_commands.new_protocol
 

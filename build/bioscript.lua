@@ -2614,6 +2614,7 @@ local mixtures = {Chemical = {}, Sequence = {}, Protein = {}, Cell = {}, Environ
 
 
 
+
 local function deepcopy(obj)
    if type(obj) ~= 'table' then return obj end
    local obj_table = obj
@@ -2923,7 +2924,7 @@ end
 mixtures.chemicals = {}
 for k, v in pairs(chemicals) do
    v.formula = formula
-   v.grams_to_molecules = function(self, n) return conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula())) end
+   v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula()))) end
    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
 end
 
@@ -2990,7 +2991,7 @@ local function protein_to_mw(self)
 end
 
 for k, v in pairs(proteins) do
-   v.grams_to_molecules = function(self, n) return conversions.grams_to_molecules(n, protein_to_mw(self)) end
+   v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, protein_to_mw(self))) end
    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
 end
 
@@ -3044,7 +3045,7 @@ local common_reagents = {
    ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
    (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
    (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-   (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
+   (mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
 
    ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
    (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
@@ -3053,6 +3054,15 @@ local common_reagents = {
    10.0),
 }
 mixtures.common_reagents = common_reagents
+
+mixtures.print_all_common_reagents = function()
+   local t = {}
+   for k, _ in pairs(mixtures.common_reagents) do
+      t[#t + 1] = k
+   end
+   table.sort(t, function(a, b) return a:lower() < b:lower() end)
+   for _, v in ipairs(t) do print(v) end
+end
 
 
 
