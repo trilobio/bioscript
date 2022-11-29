@@ -3411,6 +3411,22 @@ biologic_commands.new_protocol = function(name: string): biologic_commands.Biolo
 end
 
 
+local record state
+    record Location
+        id: string
+        position: integer
+        plate: inventory.Plate
+    end
+    record Module
+        id: string
+        locations: {Location}
+    end
+    record State
+        modules: {Module}
+    end
+end
+
+
 local record std
   atoms: atoms
   conversions: conversions
@@ -3419,6 +3435,7 @@ local record std
   biologic_commands: biologic_commands
   inventory: inventory
   json: json
+  state: state
   synbio: synbio
 end
 
@@ -3429,6 +3446,7 @@ std.util = util
 std.biologic_commands = biologic_commands
 std.inventory = inventory
 std.json = json
+std.state = state
 std.synbio = synbio
 
 return std

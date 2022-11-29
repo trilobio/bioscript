@@ -570,7 +570,7 @@ test/std/mixtures.lua
   2783    if type(obj) ~= 'table' then return obj end
    528    local obj_table = obj
    528    local res = setmetatable({}, getmetatable(obj))
-  4536    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+  5064    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
    528    return res
        end
 
@@ -873,7 +873,7 @@ test/std/mixtures.lua
        end
 
      2 mixtures.chemicals = {}
-   106 for k, v in pairs(chemicals) do
+   108 for k, v in pairs(chemicals) do
    104    v.formula = formula
    104    v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula()))) end
    104    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
@@ -905,7 +905,7 @@ test/std/mixtures.lua
      2 }
 
      2 mixtures.inchi_to_chemicals = {}
-   106 for name, chem in pairs(mixtures.chemicals) do
+   108 for name, chem in pairs(mixtures.chemicals) do
    104    mixtures.inchi_to_chemicals[chem.inchi] = name
        end
 
@@ -941,7 +941,7 @@ test/std/mixtures.lua
      2    return mw
        end
 
-     6 for k, v in pairs(proteins) do
+     8 for k, v in pairs(proteins) do
     12    v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, protein_to_mw(self))) end
      4    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
        end
@@ -957,7 +957,7 @@ test/std/mixtures.lua
      2    ["Escherichia coli MG1655"] = { name = "Escherichia coli MG1655" },
        }
      2 mixtures.cells = {}
-     4 for k, v in pairs(cells) do
+     6 for k, v in pairs(cells) do
      2    mixtures.cells[k] = setmetatable(v, mixtures.cell_mt)
        end
 
@@ -1118,7 +1118,7 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   125 for k, v in pairs(complement.COMPLEMENTS) do
+   130 for k, v in pairs(complement.COMPLEMENTS) do
    360    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
@@ -1671,7 +1671,7 @@ test/synbio/genbank.lua
    790       if type(obj) ~= 'table' then return obj end
    147       local obj_table = obj
    147       local res = setmetatable({}, getmetatable(obj))
-  1299       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+  1446       for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
    147       return res
           end
 
@@ -2168,7 +2168,7 @@ test/synbio/json.lua
        }
 
      2 local escape_char_map_inv = { ["/"] = "/" }
-    16 for k, v in pairs(escape_char_map) do
+    18 for k, v in pairs(escape_char_map) do
     14    escape_char_map_inv[v] = k
        end
 
@@ -2191,11 +2191,11 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-     8       for k in pairs(val) do
-     6          if type(k) ~= "number" then
+    12       for k in pairs(val) do
+     7          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
-     5          n = n + 1
+     6          n = n + 1
              end
      2       if n ~= #val then
      1          error("invalid table: sparse array")
@@ -2209,13 +2209,13 @@ test/synbio/json.lua
 
           else
 
-     9       for k, v in pairs(val) do
-     8          if type(k) ~= "string" then
+    13       for k, v in pairs(val) do
+     7          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
-     4          local stack_value = encode(v, stack)
-     4          if stack_value ~= nil then
-    12             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+     3          local stack_value = encode(v, stack)
+     3          if stack_value ~= nil then
+     9             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
                 end
              end
      1       stack[val] = nil
@@ -2224,16 +2224,16 @@ test/synbio/json.lua
        end
 
        local function encode_string(val)
-    18    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+    17    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
        end
 
 
        local function encode_number(val)
 
-    17    if val ~= val or val <= -math.huge or val >= math.huge then
+    15    if val ~= val or val <= -math.huge or val >= math.huge then
      3       error("unexpected number value '" .. tostring(val) .. "'")
           end
-    14    return string.format("%.14g", val)
+    12    return string.format("%.14g", val)
        end
 
 
@@ -2246,10 +2246,10 @@ test/synbio/json.lua
        }
 
        encode = function(val, stack)
-    46    local t = type(val)
-    46    local f = type_func_map[t]
-    46    if f then
-    46       return f(val, stack)
+    43    local t = type(val)
+    43    local f = type_func_map[t]
+    43    if f then
+    43       return f(val, stack)
           end
 *****0    if t ~= "function" then
 *****0       error("unexpected type '" .. t .. "'")
@@ -2709,14 +2709,14 @@ test/synbio/pcr.lua
     12       local forward_locations_indexes = {}
     12       local reverse_locations_inverted = {}
     12       local reverse_locations_indexes = {}
-    36       for idx, values in pairs(forward_locations) do
+    48       for idx, values in pairs(forward_locations) do
     72          for _, value in ipairs(values) do
     24             if forward_locations_inverted[value] == nil then forward_locations_inverted[value] = {} end
     24             forward_locations_inverted[value][#forward_locations_inverted[value] + 1] = idx
     24             forward_locations_indexes[#forward_locations_indexes + 1] = value
                 end
              end
-    32       for idx, values in pairs(reverse_locations) do
+    44       for idx, values in pairs(reverse_locations) do
     56          for _, value in ipairs(values) do
     16             if reverse_locations_inverted[value] == nil then reverse_locations_inverted[value] = {} end
     16             reverse_locations_inverted[value][#reverse_locations_inverted[value] + 1] = idx
@@ -2759,7 +2759,7 @@ test/synbio/pcr.lua
     13       fragment_set[fragment] = true
           end
     12    pcr_fragments = {}
-    25    for fragment, _ in pairs(fragment_set) do
+    37    for fragment, _ in pairs(fragment_set) do
     13       pcr_fragments[#pcr_fragments + 1] = fragment
           end
     12    return pcr_fragments

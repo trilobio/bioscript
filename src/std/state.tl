@@ -12,7 +12,6 @@ local record state
     end
     record State
         modules: {Module}
-        plates: function(): {inventory.Plate}
     end
 end
 
