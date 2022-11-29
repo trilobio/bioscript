@@ -28,6 +28,7 @@ build:
 	sed '$$d' src/std/util.tl >> tmp.tl ;\
 	sed '$$d' src/std/inventory.tl >> tmp.tl ;\
 	sed '$$d' src/std/biologic_commands.tl >> tmp.tl ;\
+	sed '$$d' src/std/state.tl >> tmp.tl ;\
 	cat src/std/std.tl >> tmp.tl ;\
 	sed -i '/require/d' tmp.tl ;\
 	sed -i 's/SUBSTITUTE_WITH_VERSION_NUMBER/0.0.1/g' tmp.tl ;\

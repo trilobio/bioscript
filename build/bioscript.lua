@@ -3411,7 +3411,24 @@ biologic_commands.new_protocol = function(name)
 end
 
 
+local state = {Location = {}, Module = {}, State = {}, }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 local std = {}
+
 
 
 
@@ -3429,6 +3446,7 @@ std.util = util
 std.biologic_commands = biologic_commands
 std.inventory = inventory
 std.json = json
+std.state = state
 std.synbio = synbio
 
 return std
