@@ -207,6 +207,7 @@ test/std/conversions.lua
 
 
 
+
      2 conversions.mol = 6.02214076 * (10 ^ 23)
      2 conversions.mmol = conversions.mol / 1000
      2 conversions.umol = conversions.mmol / 1000
@@ -228,8 +229,12 @@ test/std/conversions.lua
      2 conversions.pg = conversions.ng / 1000
      2 conversions.fg = conversions.pg / 1000
 
-     2 function conversions.g_to_mol(g, molecular_weight)
+     2 function conversions.grams_to_molecules(g, molecular_weight)
      8    return g / molecular_weight * conversions.mol
+       end
+
+     2 function conversions.molecules_to_grams(molecules, molecular_weight)
+*****0    return molecular_weight * (molecules / conversions.mol)
        end
 
      2 return conversions
@@ -466,7 +471,7 @@ test/std/inventory.lua
 ==============================================================================
 test/std/mixtures.lua
 ==============================================================================
-     2 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local pairs = _tl_compat and _tl_compat.pairs or pairs; local string = _tl_compat and _tl_compat.string or string; local atoms = require("atoms")
+     2 local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local pairs = _tl_compat and _tl_compat.pairs or pairs; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table; local atoms = require("atoms")
      2 local conversions = require("conversions")
 
      2 local mixtures = {Chemical = {}, Sequence = {}, Protein = {}, Cell = {}, Environmental = {}, Mixture_ChemicalMix = {}, Mixture_SequenceMix = {}, Mixture_ProteinMix = {}, Mixture_CellMix = {}, Mixture_EnvironmentalMix = {}, Mixture = {}, }
@@ -560,12 +565,13 @@ test/std/mixtures.lua
 
 
 
+
        local function deepcopy(obj)
-  2547    if type(obj) ~= 'table' then return obj end
-   480    local obj_table = obj
-   480    local res = setmetatable({}, getmetatable(obj))
-  4158    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
-   480    return res
+  2783    if type(obj) ~= 'table' then return obj end
+   528    local obj_table = obj
+   528    local res = setmetatable({}, getmetatable(obj))
+  4536    for k, v in pairs(obj_table) do res[deepcopy(k)] = deepcopy(v) end
+   528    return res
        end
 
 
@@ -602,42 +608,42 @@ test/std/mixtures.lua
 
      2 mixtures.mixture_mt = {
           __add = function(self, t)
-    38       local copy = deepcopy(self)
+    44       local copy = deepcopy(self)
 
 
 
 
 
 
-    38       if t.chemicals ~= nil then
-    36          if copy.chemicals == nil then copy.chemicals = {} end
-   126          for _, chemicalMix in ipairs(t.chemicals) do
-    54             local found = false
-   440             for i, tbl in ipairs(copy.chemicals) do
-   332                if tbl.chemical.inchi == chemicalMix.chemical.inchi then
+    44       if t.chemicals ~= nil then
+    42          if copy.chemicals == nil then copy.chemicals = {} end
+   148          for _, chemicalMix in ipairs(t.chemicals) do
+    64             local found = false
+   478             for i, tbl in ipairs(copy.chemicals) do
+   350                if tbl.chemical.inchi == chemicalMix.chemical.inchi then
 *****0                   copy.chemicals[i].quantity = copy.chemicals[i].quantity + chemicalMix.quantity
 *****0                   found = true
                       end
                    end
-    54             if not found then
-    54                local newSubmix = { chemical = chemicalMix.chemical, quantity = chemicalMix.quantity }
-   108                newSubmix = deepcopy(newSubmix)
-    54                if copy.chemicals == nil then
+    64             if not found then
+    64                local newSubmix = { chemical = chemicalMix.chemical, quantity = chemicalMix.quantity }
+   128                newSubmix = deepcopy(newSubmix)
+    64                if copy.chemicals == nil then
 *****0                   copy.chemicals = { newSubmix }
                       else
-    54                   copy.chemicals[#copy.chemicals + 1] = newSubmix
+    64                   copy.chemicals[#copy.chemicals + 1] = newSubmix
                       end
                    end
                 end
              end
 
 
-    38       if t.sequences ~= nil then
+    44       if t.sequences ~= nil then
 *****0          if copy.sequences == nil then copy.sequences = {} end
 *****0          for _, sequenceMix in ipairs(t.sequences) do
 *****0             local found = false
 *****0             for i, tbl in ipairs(copy.sequences) do
-*****0                if tbl.sequence.seqhash == sequenceMix.sequence.seqhash then
+*****0                if tbl.sequence == sequenceMix.sequence then
 *****0                   copy.sequences[i].quantity = copy.sequences[i].quantity + sequenceMix.quantity
 *****0                   found = true
                       end
@@ -653,7 +659,7 @@ test/std/mixtures.lua
                    end
                 end
              end
-    38       if t.proteins ~= nil then
+    44       if t.proteins ~= nil then
      2          if copy.proteins == nil then copy.proteins = {} end
      6          for _, proteinMix in ipairs(t.proteins) do
      2             local found = false
@@ -674,7 +680,7 @@ test/std/mixtures.lua
                    end
                 end
              end
-    38       if t.cells ~= nil then
+    44       if t.cells ~= nil then
 *****0          if copy.cells == nil then copy.cells = {} end
 *****0          for _, cellMix in ipairs(t.cells) do
 *****0             local found = false
@@ -695,7 +701,7 @@ test/std/mixtures.lua
                    end
                 end
              end
-    38       if t.environmentals ~= nil then
+    44       if t.environmentals ~= nil then
 *****0          if copy.environmentals == nil then copy.environmentals = {} end
 *****0          for _, environmentalMix in ipairs(t.environmentals) do
 *****0             local found = false
@@ -717,22 +723,22 @@ test/std/mixtures.lua
                 end
              end
 
-    38       return copy
+    44       return copy
           end,
 
           __mul = function(self, quantity)
 
 
 
-    30       local tbls = { self.chemicals, self.sequences, self.proteins, self.cells, self.environmentals }
-    90       for _, tbl in ipairs(tbls) do
-    30          if tbl ~= nil then
-    90             for _, sub_tbl in ipairs(tbl) do
-    30                sub_tbl.quantity = sub_tbl.quantity * quantity
+    38       local tbls = { self.chemicals, self.sequences, self.proteins, self.cells, self.environmentals }
+   114       for _, tbl in ipairs(tbls) do
+    38          if tbl ~= nil then
+   118             for _, sub_tbl in ipairs(tbl) do
+    42                sub_tbl.quantity = sub_tbl.quantity * quantity
                    end
                 end
              end
-    30       return self
+    38       return self
           end,
 
           __div = function(self, quantity)
@@ -753,9 +759,9 @@ test/std/mixtures.lua
 
      2 mixtures.chemical_mt = {
           __mul = function(self, quantity)
-    40       local mix = setmetatable({ chemicals = { { chemical = self, quantity = quantity } } }, mixtures.mixture_mt)
-    40       mix.volume = mixtures.volume
-    40       return mix
+    50       local mix = setmetatable({ chemicals = { { chemical = self, quantity = quantity } } }, mixtures.mixture_mt)
+    50       mix.volume = mixtures.volume
+    50       return mix
           end,
      2 }
 
@@ -810,6 +816,7 @@ test/std/mixtures.lua
      2    FeCl3 = { inchi = "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3" },
      2    glucose = { inchi = "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1" },
      2    H3BO3 = { inchi = "InChI=1S/BH3O3/c2-1(3)4/h2-4H" },
+     2    KCl = { inchi = "InChI=1S/ClH.K/h1H;/q;+1/p-1" },
      2    KH2PO4 = { inchi = "InChI=1S/K.H3O4P/c;1-5(2,3)4/h;(H3,1,2,3,4)/q+1;/p-1" },
      2    MgSO4 = { inchi = "InChI=1S/Mg.H2O4S/c;1-5(2,3)4/h;(H2,1,2,3,4)/q+2;/p-2" },
      2    MgCl2 = { inchi = "InChI=1S/2ClH.Mg/h2*1H;/q;;+2/p-2" },
@@ -847,6 +854,18 @@ test/std/mixtures.lua
      2    valine = { inchi = "InChI=1S/C5H11NO2/c1-3(2)4(6)5(7)8/h3-4H,6H2,1-2H3,(H,7,8)/t4-/m0/s1" },
      2    selenocysteine = { inchi = "InChI=1S/C3H6NO2Se/c4-2(1-7)3(5)6/h2H,1,4H2,(H,5,6)/t2-/m0/s1" },
      2    pyrrolysine = { inchi = "InChI=1S/C12H21N3O3/c1-8-5-7-14-10(8)11(16)15-6-3-2-4-9(13)12(17)18/h7-10H,2-6,13H2,1H3,(H,15,16)(H,17,18)/t8-,9+,10-/m1/s1" },
+
+
+     2    dAMP = { inchi = "InChI=1S/C10H14N5O6P/c11-9-8-10(13-3-12-9)15(4-14-8)7-1-5(16)6(21-7)2-20-22(17,18)19/h3-7,16H,1-2H2,(H2,11,12,13)(H2,17,18,19)/t5-,6+,7+/m0/s1" },
+     2    dTMP = { inchi = "InChI=1S/C10H15N2O8P/c1-5-3-12(10(15)11-9(5)14)8-2-6(13)7(20-8)4-19-21(16,17)18/h3,6-8,13H,2,4H2,1H3,(H,11,14,15)(H2,16,17,18)/t6-,7+,8+/m0/s1" },
+     2    dGMP = { inchi = "InChI=1S/C10H14N5O7P/c11-10-13-8-7(9(17)14-10)12-3-15(8)6-1-4(16)5(22-6)2-21-23(18,19)20/h3-6,16H,1-2H2,(H2,18,19,20)(H3,11,13,14,17)/t4-,5+,6+/m0/s1" },
+     2    dCMP = { inchi = "InChI=1S/C9H14N3O7P/c10-7-1-2-12(9(14)11-7)8-3-5(13)6(19-8)4-18-20(15,16)17/h1-2,5-6,8,13H,3-4H2,(H2,10,11,14)(H2,15,16,17)/t5-,6+,8+/m0/s1" },
+
+     2    AMP = { inchi = "InChI=1S/C10H14N5O7P/c11-8-5-9(13-2-12-8)15(3-14-5)10-7(17)6(16)4(22-10)1-21-23(18,19)20/h2-4,6-7,10,16-17H,1H2,(H2,11,12,13)(H2,18,19,20)/t4-,6-,7-,10-/m1/s1" },
+     2    UMP = { inchi = "InChI=1S/C9H13N2O9P/c12-5-1-2-11(9(15)10-5)8-7(14)6(13)4(20-8)3-19-21(16,17)18/h1-2,4,6-8,13-14H,3H2,(H,10,12,15)(H2,16,17,18)/t4-,6-,7-,8-/m1/s1" },
+     2    GMP = { inchi = "InChI=1S/C10H14N5O8P/c11-10-13-7-4(8(18)14-10)12-2-15(7)9-6(17)5(16)3(23-9)1-22-24(19,20)21/h2-3,5-6,9,16-17H,1H2,(H2,19,20,21)(H3,11,13,14,18)/t3-,5-,6-,9-/m1/s1" },
+     2    CMP = { inchi = "InChI=1S/C9H14N3O8P/c10-5-1-2-12(9(15)11-5)8-7(14)6(13)4(20-8)3-19-21(16,17)18/h1-2,4,6-8,13-14H,3H2,(H2,10,11,15)(H2,16,17,18)/t4-,6-,7-,8-/m1/s1" },
+
        }
 
        local function formula(self)
@@ -854,10 +873,10 @@ test/std/mixtures.lua
        end
 
      2 mixtures.chemicals = {}
-    88 for k, v in pairs(chemicals) do
-    86    v.formula = formula
-    86    v.g_to_mol = function(self, n) return conversions.g_to_mol(n, atoms.formula_to_mw(self:formula())) end
-    86    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
+   106 for k, v in pairs(chemicals) do
+   104    v.formula = formula
+   104    v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula()))) end
+   104    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
        end
 
      2 mixtures.amino_acid_weights = {
@@ -885,6 +904,20 @@ test/std/mixtures.lua
      6    O = atoms.formula_to_mw(mixtures.chemicals.pyrrolysine:formula()),
      2 }
 
+     2 mixtures.inchi_to_chemicals = {}
+   106 for name, chem in pairs(mixtures.chemicals) do
+   104    mixtures.inchi_to_chemicals[chem.inchi] = name
+       end
+
+       mixtures.print_all_chemicals = function()
+*****0    local t = {}
+*****0    for k, _ in pairs(mixtures.chemicals) do
+*****0       t[#t + 1] = k
+          end
+*****0    table.sort(t, function(a, b) return a:lower() < b:lower() end)
+*****0    for _, v in ipairs(t) do print(v) end
+       end
+
 
 
 
@@ -893,6 +926,7 @@ test/std/mixtures.lua
 
      2 local proteins = {
      2    human_serum_albumin = { sequence = "MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPFEDHVKLVNEVTEFAKTCVADESAENCDKSLHTLFGDKLCTVATLRETYGEMADCCAKQEPERNECFLQHKDDNPNLPRLVRPEVDVMCTAFHDNEETFLKKYLYEIARRHPYFYAPELLFFAKRYKAAFTECCQAADKAACLLPKLDELRDEGKASSAKQRLKCASLQKFGERAFKAWAVARLSQRFPKAEFAEVSKLVTDLTKVHTECCHGDLLECADDRADLAKYICENQDSISSKLKECCEKPLLEKSHCIAEVENDEMPADLPSLAADFVESKDVCKNYAEAKDVFLGMFLYEYARRHPDYSVVLLLRLAKTYETTLEKCCAAADPHECYAKVFDEFKPLVEEPQNLIKQNCELFEQLGEYKFQNALLVRYTKKVPQVSTPTLVEVSRNLGKVGSKCCKHPEAKRMPCAEDYLSVVLNQLCVLHEKTPVSDRVTKCCTESLVNRRPCFSALEVDETYVPKEFNAETFTFHADICTLSEKERQIKKQTALVELVKHKPKATKEQLKAVMDDFAAFVEKCCKADDKETCFAEEGKKLVAASQAALGL" },
+     2    taq = { sequence = "MRGMLPLFEPKGRVLLVDGHHLAYRTFHALKGLTTSRGEPVQAVYGFAKSLLKALKEDGDAVIVVFDAKAPSFRHEAYGGYKAGRAPTPEDFPRQLALIKELVDLLGLARLEVPGYEADDVLASLAKKAEKEGYEVRILTADKDLYQLLSDRIHVLHPEGYLITPAWLWEKYGLRPDQWADYRALTGDESDNLPGVKGIGEKTARKLLEEWGSLEALLKNLDRLKPAIREKILAHMDDLKLSWDLAKVRTDLPLEVDFAKRREPDRERLRAFLERLEFGSLLHEFGLLESPKALEEAPWPPPEGAFVGFVLSRKEPMWADLLALAAARGGRVHRAPEPYKALRDLKEARGLLAKDLSVLALREGLGLPPGDDPMLLAYLLDPSNTTPEGVARRYGGEWTEEAGERAALSERLFANLWGRLEGEERLLWLYREVERPLSAVLAHMEATGVRLDVAYLRALSLEVAEEIARLEAEVFRLAGHPFNLNSRDQLERVLFDELGLPAIGKTEKTGKRSTSAAVLEALREAHPIVEKILQYRELTKLKSTYIDPLPDLIHPRTGRLHTRFNQTATATGRLSSSDPNLQNIPVRTPLGQRIRRAFIAEEGWLLVALDYSQIELRVLAHLSGDENLIRVFQEGRDIHTETASWMFGVPREAVDPLMRRAAKTINFGVLYGMSAHRLSQELAIPYEEAQAFIERYFQSFPKVRAWIEKTLEEGRRRGYVETLFGRRRYVPDLEARVKSVREAAERMAFNMPVQGTAADLMKLAMVKLFPRLEEMGARMLLQVHDELVLEAPKERAEAVARLAKEVMEGVYPLAVPLEVEVGIGEDWLSAKE" },
        }
      2 mixtures.proteins = {}
        local function protein_to_mw(self)
@@ -907,9 +941,9 @@ test/std/mixtures.lua
      2    return mw
        end
 
-     4 for k, v in pairs(proteins) do
-     6    v.g_to_mol = function(self, n) return conversions.g_to_mol(n, protein_to_mw(self)) end
-     2    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
+     6 for k, v in pairs(proteins) do
+    12    v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, protein_to_mw(self))) end
+     4    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
        end
 
 
@@ -939,9 +973,9 @@ test/std/mixtures.lua
      2    M9 = (mixtures.chemicals.H2O * conversions.l) +
      6    (mixtures.chemicals.CaCl2 * 0.3 * conversions.mmol) +
      6    (mixtures.chemicals.MgSO4 * 1 * conversions.mmol) +
-     6    (mixtures.chemicals.biotin * conversions.g_to_mol(conversions.mg, 244.31)) +
-     6    (mixtures.chemicals.thiamin * conversions.g_to_mol(conversions.mg, 265.355)) +
-     6    (mixtures.chemicals.glucose * conversions.g_to_mol(4 * conversions.g, 180.156)) +
+     6    (mixtures.chemicals.biotin * conversions.grams_to_molecules(conversions.mg, 244.31)) +
+     6    (mixtures.chemicals.thiamin * conversions.grams_to_molecules(conversions.mg, 265.355)) +
+     6    (mixtures.chemicals.glucose * conversions.grams_to_molecules(4 * conversions.g, 180.156)) +
      4    (((mixtures.chemicals.Na2HPO4 * 337 * conversions.mmol) +
      6    (mixtures.chemicals.KH2PO4 * 220 * conversions.mmol) +
      6    (mixtures.chemicals.NaCl * 85.5 * conversions.mmol) +
@@ -955,15 +989,31 @@ test/std/mixtures.lua
      6    (mixtures.chemicals.H3BO3 * 162 * conversions.umol) +
      6    (mixtures.chemicals.MnCl2 * 8.1 * conversions.umol)) /
      6    100),
+     4    H2O = (mixtures.chemicals.H2O * conversions.l),
 
 
 
      2    ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
      6    (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
      6    (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-     8    (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug)),
+     6    (mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
+
+     2    ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
+     4    (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
+     6    (mixtures.chemicals.KCl * 50 * conversions.mmol) +
+     6    (mixtures.chemicals.MgCl2 * 1.5 * conversions.mmol)) *
+     6    10.0),
        }
      2 mixtures.common_reagents = common_reagents
+
+       mixtures.print_all_common_reagents = function()
+*****0    local t = {}
+*****0    for k, _ in pairs(mixtures.common_reagents) do
+*****0       t[#t + 1] = k
+          end
+*****0    table.sort(t, function(a, b) return a:lower() < b:lower() end)
+*****0    for _, v in ipairs(t) do print(v) end
+       end
 
      2 return mixtures
 
@@ -1068,8 +1118,8 @@ test/synbio/complement.lua
           W = "W",
           Y = "R",
      5 }
-   115 for k, v in pairs(complement.COMPLEMENTS) do
-   330    complement.COMPLEMENTS[k:lower()] = v:lower()
+   125 for k, v in pairs(complement.COMPLEMENTS) do
+   360    complement.COMPLEMENTS[k:lower()] = v:lower()
        end
 
 
@@ -2141,11 +2191,11 @@ test/synbio/json.lua
      8    if rawget(val, 1) ~= nil or next(val) == nil then
 
      3       local n = 0
-     9       for k in pairs(val) do
-     7          if type(k) ~= "number" then
+     8       for k in pairs(val) do
+     6          if type(k) ~= "number" then
      1             error("invalid table: mixed or invalid key types")
                 end
-     6          n = n + 1
+     5          n = n + 1
              end
      2       if n ~= #val then
      1          error("invalid table: sparse array")
@@ -2159,13 +2209,13 @@ test/synbio/json.lua
 
           else
 
-     8       for k, v in pairs(val) do
-     7          if type(k) ~= "string" then
+     9       for k, v in pairs(val) do
+     8          if type(k) ~= "string" then
      4             error("invalid table: mixed or invalid key types")
                 end
-     3          local stack_value = encode(v, stack)
-     3          if stack_value ~= nil then
-     9             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+     4          local stack_value = encode(v, stack)
+     4          if stack_value ~= nil then
+    12             table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
                 end
              end
      1       stack[val] = nil
@@ -2174,16 +2224,16 @@ test/synbio/json.lua
        end
 
        local function encode_string(val)
-    17    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+    18    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
        end
 
 
        local function encode_number(val)
 
-    15    if val ~= val or val <= -math.huge or val >= math.huge then
+    17    if val ~= val or val <= -math.huge or val >= math.huge then
      3       error("unexpected number value '" .. tostring(val) .. "'")
           end
-    12    return string.format("%.14g", val)
+    14    return string.format("%.14g", val)
        end
 
 
@@ -2196,10 +2246,10 @@ test/synbio/json.lua
        }
 
        encode = function(val, stack)
-    43    local t = type(val)
-    43    local f = type_func_map[t]
-    43    if f then
-    43       return f(val, stack)
+    46    local t = type(val)
+    46    local f = type_func_map[t]
+    46    if f then
+    46       return f(val, stack)
           end
 *****0    if t ~= "function" then
 *****0       error("unexpected type '" .. t .. "'")
@@ -2517,7 +2567,10 @@ test/synbio/pcr.lua
 
 
 
-     1 function pcr.design_primers_with_overhang(template, forward_overhang, reverse_overhang, target_tm, options)
+     1 function pcr.design_primers_with_overhang(template, polymerase, forward_overhang, reverse_overhang, target_tm, options)
+     2    if polymerase ~= "taq_standard" then
+*****0       error("Got unknown polymerase")
+          end
      4    template = template:upper()
 
 
@@ -2552,8 +2605,8 @@ test/synbio/pcr.lua
 
 
 
-     1 function pcr.design_primers(template, target_tm, options)
-     1    return pcr.design_primers_with_overhang(template, "", "", target_tm, options)
+     1 function pcr.design_primers(template, polymerase, target_tm, options)
+     1    return pcr.design_primers_with_overhang(template, polymerase, "", "", target_tm, options)
        end
 
 
@@ -3140,9 +3193,9 @@ Summary
 File                       Hits Missed Coverage
 -----------------------------------------------
 test/std/atoms.lua         27   0      100.00%
-test/std/conversions.lua   22   0      100.00%
+test/std/conversions.lua   23   1      95.83%
 test/std/inventory.lua     36   0      100.00%
-test/std/mixtures.lua      194  58     76.98%
+test/std/mixtures.lua      213  68     75.80%
 test/std/util.lua          7    0      100.00%
 test/synbio/complement.lua 15   0      100.00%
 test/synbio/fasta.lua      21   0      100.00%
@@ -3150,8 +3203,8 @@ test/synbio/fastq.lua      29   0      100.00%
 test/synbio/fragment.lua   65   30     68.42%
 test/synbio/genbank.lua    232  57     80.28%
 test/synbio/json.lua       187  9      95.41%
-test/synbio/pcr.lua        125  0      100.00%
+test/synbio/pcr.lua        126  1      99.21%
 test/synbio/primers.lua    62   0      100.00%
 test/synbio/rebase.lua     49   0      100.00%
 -----------------------------------------------
-Total                      1071 154    87.43%
+Total                      1092 166    86.80%

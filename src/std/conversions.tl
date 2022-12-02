@@ -26,7 +26,8 @@ local record conversions
   ng: number
   pg: number
   fg: number
-  g_to_mol: function(number, number): number
+  grams_to_molecules: function(number, number): number
+  molecules_to_grams: function(number, number): number
 end
 
 -- Conversions
@@ -51,8 +52,12 @@ conversions.ng = conversions.ug / 1000
 conversions.pg = conversions.ng / 1000
 conversions.fg = conversions.pg / 1000
 
-function conversions.g_to_mol(g: number, molecular_weight: number): number
+function conversions.grams_to_molecules(g: number, molecular_weight: number): number
     return g / molecular_weight * conversions.mol
+end
+
+function conversions.molecules_to_grams(molecules: number, molecular_weight: number): number
+  return molecular_weight * (molecules/conversions.mol)
 end
 
 return conversions
