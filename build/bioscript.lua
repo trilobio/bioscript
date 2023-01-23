@@ -810,7 +810,10 @@ pcr.minimal_primer_length = 12
 
 
 
-function pcr.design_primers_with_overhang(template, forward_overhang, reverse_overhang, target_tm, options)
+function pcr.design_primers_with_overhang(template, polymerase, forward_overhang, reverse_overhang, target_tm, options)
+   if polymerase ~= "taq_standard" then
+      error("Got unknown polymerase")
+   end
    template = template:upper()
 
 
@@ -844,8 +847,8 @@ end
 
 
 
-function pcr.design_primers(template, target_tm, options)
-   return pcr.design_primers_with_overhang(template, "", "", target_tm, options)
+function pcr.design_primers(template, polymerase, target_tm, options)
+   return pcr.design_primers_with_overhang(template, polymerase, "", "", target_tm, options)
 end
 
 
@@ -2489,6 +2492,7 @@ local conversions = {}
 
 
 
+
 conversions.mol = 6.02214076 * (10 ^ 23)
 conversions.mmol = conversions.mol / 1000
 conversions.umol = conversions.mmol / 1000
@@ -2510,12 +2514,17 @@ conversions.ng = conversions.ug / 1000
 conversions.pg = conversions.ng / 1000
 conversions.fg = conversions.pg / 1000
 
-function conversions.g_to_mol(g, molecular_weight)
+function conversions.grams_to_molecules(g, molecular_weight)
    return g / molecular_weight * conversions.mol
+end
+
+function conversions.molecules_to_grams(molecules, molecular_weight)
+   return molecular_weight * (molecules / conversions.mol)
 end
 
 
 local mixtures = {Chemical = {}, Sequence = {}, Protein = {}, Cell = {}, Environmental = {}, Mixture_ChemicalMix = {}, Mixture_SequenceMix = {}, Mixture_ProteinMix = {}, Mixture_CellMix = {}, Mixture_EnvironmentalMix = {}, Mixture = {}, }
+
 
 
 
@@ -2683,7 +2692,7 @@ mixtures.mixture_mt = {
          for _, sequenceMix in ipairs(t.sequences) do
             local found = false
             for i, tbl in ipairs(copy.sequences) do
-               if tbl.sequence.seqhash == sequenceMix.sequence.seqhash then
+               if tbl.sequence == sequenceMix.sequence then
                   copy.sequences[i].quantity = copy.sequences[i].quantity + sequenceMix.quantity
                   found = true
                end
@@ -2856,6 +2865,7 @@ local chemicals = {
    FeCl3 = { inchi = "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3" },
    glucose = { inchi = "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1" },
    H3BO3 = { inchi = "InChI=1S/BH3O3/c2-1(3)4/h2-4H" },
+   KCl = { inchi = "InChI=1S/ClH.K/h1H;/q;+1/p-1" },
    KH2PO4 = { inchi = "InChI=1S/K.H3O4P/c;1-5(2,3)4/h;(H3,1,2,3,4)/q+1;/p-1" },
    MgSO4 = { inchi = "InChI=1S/Mg.H2O4S/c;1-5(2,3)4/h;(H2,1,2,3,4)/q+2;/p-2" },
    MgCl2 = { inchi = "InChI=1S/2ClH.Mg/h2*1H;/q;;+2/p-2" },
@@ -2893,6 +2903,18 @@ local chemicals = {
    valine = { inchi = "InChI=1S/C5H11NO2/c1-3(2)4(6)5(7)8/h3-4H,6H2,1-2H3,(H,7,8)/t4-/m0/s1" },
    selenocysteine = { inchi = "InChI=1S/C3H6NO2Se/c4-2(1-7)3(5)6/h2H,1,4H2,(H,5,6)/t2-/m0/s1" },
    pyrrolysine = { inchi = "InChI=1S/C12H21N3O3/c1-8-5-7-14-10(8)11(16)15-6-3-2-4-9(13)12(17)18/h7-10H,2-6,13H2,1H3,(H,15,16)(H,17,18)/t8-,9+,10-/m1/s1" },
+
+
+   dAMP = { inchi = "InChI=1S/C10H14N5O6P/c11-9-8-10(13-3-12-9)15(4-14-8)7-1-5(16)6(21-7)2-20-22(17,18)19/h3-7,16H,1-2H2,(H2,11,12,13)(H2,17,18,19)/t5-,6+,7+/m0/s1" },
+   dTMP = { inchi = "InChI=1S/C10H15N2O8P/c1-5-3-12(10(15)11-9(5)14)8-2-6(13)7(20-8)4-19-21(16,17)18/h3,6-8,13H,2,4H2,1H3,(H,11,14,15)(H2,16,17,18)/t6-,7+,8+/m0/s1" },
+   dGMP = { inchi = "InChI=1S/C10H14N5O7P/c11-10-13-8-7(9(17)14-10)12-3-15(8)6-1-4(16)5(22-6)2-21-23(18,19)20/h3-6,16H,1-2H2,(H2,18,19,20)(H3,11,13,14,17)/t4-,5+,6+/m0/s1" },
+   dCMP = { inchi = "InChI=1S/C9H14N3O7P/c10-7-1-2-12(9(14)11-7)8-3-5(13)6(19-8)4-18-20(15,16)17/h1-2,5-6,8,13H,3-4H2,(H2,10,11,14)(H2,15,16,17)/t5-,6+,8+/m0/s1" },
+
+   AMP = { inchi = "InChI=1S/C10H14N5O7P/c11-8-5-9(13-2-12-8)15(3-14-5)10-7(17)6(16)4(22-10)1-21-23(18,19)20/h2-4,6-7,10,16-17H,1H2,(H2,11,12,13)(H2,18,19,20)/t4-,6-,7-,10-/m1/s1" },
+   UMP = { inchi = "InChI=1S/C9H13N2O9P/c12-5-1-2-11(9(15)10-5)8-7(14)6(13)4(20-8)3-19-21(16,17)18/h1-2,4,6-8,13-14H,3H2,(H,10,12,15)(H2,16,17,18)/t4-,6-,7-,8-/m1/s1" },
+   GMP = { inchi = "InChI=1S/C10H14N5O8P/c11-10-13-7-4(8(18)14-10)12-2-15(7)9-6(17)5(16)3(23-9)1-22-24(19,20)21/h2-3,5-6,9,16-17H,1H2,(H2,19,20,21)(H3,11,13,14,18)/t3-,5-,6-,9-/m1/s1" },
+   CMP = { inchi = "InChI=1S/C9H14N3O8P/c10-5-1-2-12(9(15)11-5)8-7(14)6(13)4(20-8)3-19-21(16,17)18/h1-2,4,6-8,13-14H,3H2,(H2,10,11,15)(H2,16,17,18)/t4-,6-,7-,8-/m1/s1" },
+
 }
 
 local function formula(self)
@@ -2902,7 +2924,7 @@ end
 mixtures.chemicals = {}
 for k, v in pairs(chemicals) do
    v.formula = formula
-   v.g_to_mol = function(self, n) return conversions.g_to_mol(n, atoms.formula_to_mw(self:formula())) end
+   v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, atoms.formula_to_mw(self:formula()))) end
    mixtures.chemicals[k] = setmetatable(v, mixtures.chemical_mt)
 end
 
@@ -2931,6 +2953,20 @@ mixtures.amino_acid_weights = {
    O = atoms.formula_to_mw(mixtures.chemicals.pyrrolysine:formula()),
 }
 
+mixtures.inchi_to_chemicals = {}
+for name, chem in pairs(mixtures.chemicals) do
+   mixtures.inchi_to_chemicals[chem.inchi] = name
+end
+
+mixtures.print_all_chemicals = function()
+   local t = {}
+   for k, _ in pairs(mixtures.chemicals) do
+      t[#t + 1] = k
+   end
+   table.sort(t, function(a, b) return a:lower() < b:lower() end)
+   for _, v in ipairs(t) do print(v) end
+end
+
 
 
 
@@ -2939,6 +2975,7 @@ mixtures.amino_acid_weights = {
 
 local proteins = {
    human_serum_albumin = { sequence = "MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPFEDHVKLVNEVTEFAKTCVADESAENCDKSLHTLFGDKLCTVATLRETYGEMADCCAKQEPERNECFLQHKDDNPNLPRLVRPEVDVMCTAFHDNEETFLKKYLYEIARRHPYFYAPELLFFAKRYKAAFTECCQAADKAACLLPKLDELRDEGKASSAKQRLKCASLQKFGERAFKAWAVARLSQRFPKAEFAEVSKLVTDLTKVHTECCHGDLLECADDRADLAKYICENQDSISSKLKECCEKPLLEKSHCIAEVENDEMPADLPSLAADFVESKDVCKNYAEAKDVFLGMFLYEYARRHPDYSVVLLLRLAKTYETTLEKCCAAADPHECYAKVFDEFKPLVEEPQNLIKQNCELFEQLGEYKFQNALLVRYTKKVPQVSTPTLVEVSRNLGKVGSKCCKHPEAKRMPCAEDYLSVVLNQLCVLHEKTPVSDRVTKCCTESLVNRRPCFSALEVDETYVPKEFNAETFTFHADICTLSEKERQIKKQTALVELVKHKPKATKEQLKAVMDDFAAFVEKCCKADDKETCFAEEGKKLVAASQAALGL" },
+   taq = { sequence = "MRGMLPLFEPKGRVLLVDGHHLAYRTFHALKGLTTSRGEPVQAVYGFAKSLLKALKEDGDAVIVVFDAKAPSFRHEAYGGYKAGRAPTPEDFPRQLALIKELVDLLGLARLEVPGYEADDVLASLAKKAEKEGYEVRILTADKDLYQLLSDRIHVLHPEGYLITPAWLWEKYGLRPDQWADYRALTGDESDNLPGVKGIGEKTARKLLEEWGSLEALLKNLDRLKPAIREKILAHMDDLKLSWDLAKVRTDLPLEVDFAKRREPDRERLRAFLERLEFGSLLHEFGLLESPKALEEAPWPPPEGAFVGFVLSRKEPMWADLLALAAARGGRVHRAPEPYKALRDLKEARGLLAKDLSVLALREGLGLPPGDDPMLLAYLLDPSNTTPEGVARRYGGEWTEEAGERAALSERLFANLWGRLEGEERLLWLYREVERPLSAVLAHMEATGVRLDVAYLRALSLEVAEEIARLEAEVFRLAGHPFNLNSRDQLERVLFDELGLPAIGKTEKTGKRSTSAAVLEALREAHPIVEKILQYRELTKLKSTYIDPLPDLIHPRTGRLHTRFNQTATATGRLSSSDPNLQNIPVRTPLGQRIRRAFIAEEGWLLVALDYSQIELRVLAHLSGDENLIRVFQEGRDIHTETASWMFGVPREAVDPLMRRAAKTINFGVLYGMSAHRLSQELAIPYEEAQAFIERYFQSFPKVRAWIEKTLEEGRRRGYVETLFGRRRYVPDLEARVKSVREAAERMAFNMPVQGTAADLMKLAMVKLFPRLEEMGARMLLQVHDELVLEAPKERAEAVARLAKEVMEGVYPLAVPLEVEVGIGEDWLSAKE" },
 }
 mixtures.proteins = {}
 local function protein_to_mw(self)
@@ -2954,7 +2991,7 @@ local function protein_to_mw(self)
 end
 
 for k, v in pairs(proteins) do
-   v.g_to_mol = function(self, n) return conversions.g_to_mol(n, protein_to_mw(self)) end
+   v.grams_to_molecules = function(self, n) return self * (conversions.grams_to_molecules(n, protein_to_mw(self))) end
    mixtures.proteins[k] = setmetatable(v, mixtures.protein_mt)
 end
 
@@ -2985,9 +3022,9 @@ local common_reagents = {
    M9 = (mixtures.chemicals.H2O * conversions.l) +
    (mixtures.chemicals.CaCl2 * 0.3 * conversions.mmol) +
    (mixtures.chemicals.MgSO4 * 1 * conversions.mmol) +
-   (mixtures.chemicals.biotin * conversions.g_to_mol(conversions.mg, 244.31)) +
-   (mixtures.chemicals.thiamin * conversions.g_to_mol(conversions.mg, 265.355)) +
-   (mixtures.chemicals.glucose * conversions.g_to_mol(4 * conversions.g, 180.156)) +
+   (mixtures.chemicals.biotin * conversions.grams_to_molecules(conversions.mg, 244.31)) +
+   (mixtures.chemicals.thiamin * conversions.grams_to_molecules(conversions.mg, 265.355)) +
+   (mixtures.chemicals.glucose * conversions.grams_to_molecules(4 * conversions.g, 180.156)) +
    (((mixtures.chemicals.Na2HPO4 * 337 * conversions.mmol) +
    (mixtures.chemicals.KH2PO4 * 220 * conversions.mmol) +
    (mixtures.chemicals.NaCl * 85.5 * conversions.mmol) +
@@ -3001,15 +3038,31 @@ local common_reagents = {
    (mixtures.chemicals.H3BO3 * 162 * conversions.umol) +
    (mixtures.chemicals.MnCl2 * 8.1 * conversions.umol)) /
    100),
+   H2O = (mixtures.chemicals.H2O * conversions.l),
 
 
 
    ["NEBuffer_r1.1_u"] = (mixtures.chemicals.H2O * conversions.l) +
    (mixtures.chemicals.bis_tris_propane_HCl * 10 * conversions.mmol) +
    (mixtures.chemicals.MgCl2 * 10 * conversions.mmol) +
-   (mixtures.proteins.human_serum_albumin * mixtures.proteins.human_serum_albumin:g_to_mol(100 * conversions.ug)),
+   (mixtures.proteins.human_serum_albumin:grams_to_molecules(100 * conversions.ug)),
+
+   ["NEB_Taq_Standard_Buffer_10X"] = (mixtures.chemicals.H2O * conversions.l) +
+   (((mixtures.chemicals.tris_HCl * 10 * conversions.mmol) +
+   (mixtures.chemicals.KCl * 50 * conversions.mmol) +
+   (mixtures.chemicals.MgCl2 * 1.5 * conversions.mmol)) *
+   10.0),
 }
 mixtures.common_reagents = common_reagents
+
+mixtures.print_all_common_reagents = function()
+   local t = {}
+   for k, _ in pairs(mixtures.common_reagents) do
+      t[#t + 1] = k
+   end
+   table.sort(t, function(a, b) return a:lower() < b:lower() end)
+   for _, v in ipairs(t) do print(v) end
+end
 
 
 
@@ -3258,7 +3311,7 @@ end
 
 
 
-local biologic_commands = {Mix = {}, BiologicCommand = {}, BiologicCommands = {}, }
+local biologic_commands = {PcrOptions = {}, Sample = {}, Mix = {}, BiologicCommand = {}, BiologicCommands = {}, }
 
 
 
@@ -3278,20 +3331,83 @@ local biologic_commands = {Mix = {}, BiologicCommand = {}, BiologicCommands = {}
 
 
 
-protocol = { name = "untitled_protocol", biologic_commands = {} }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+biologic_commands.make_mixture = function(self, mix)
+   local command = { biologic_command_type = 1, mix = mix }
+   self.biologic_commands[#self.biologic_commands + 1] = command
+   return command
+end
+
+biologic_commands.simulate = function(self)
+   print("Simulating protocol: " .. self.name)
+   for i, cmd in ipairs(self.biologic_commands) do
+      print("Step: " .. tostring(i))
+      print("  Make mixture of following chemicals:")
+      for j, chemicalMix in ipairs(cmd.mix.mixture.chemicals) do
+         local grams = conversions.molecules_to_grams(chemicalMix.quantity, atoms.formula_to_mw(mixtures.chemicals[mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi]]:formula()))
+
+         print("    ", j .. ". " .. tostring(grams) .. " grams of " .. mixtures.inchi_to_chemicals[chemicalMix.chemical.inchi])
+      end
+   end
+end
 
 biologic_commands.new_protocol = function(name)
-   protocol = { name = name, biologic_commands = {} }
+   local protocol = { name = name, biologic_commands = {} }
    protocol.append = function(self, command)
       self.biologic_commands[#self.biologic_commands + 1] = command
    end
+   protocol.make_mixture = biologic_commands.make_mixture
+   protocol.simulate = biologic_commands.simulate
    return protocol
-end
-
-biologic_commands.mix = function(mix)
-   local command = { biologic_command_type = 1, mix = mix }
-   protocol.biologic_commands[#protocol.biologic_commands + 1] = command
-   return command
 end
 
 

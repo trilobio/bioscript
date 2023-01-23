@@ -1,0 +1,37 @@
+html {
+	padding-top: 1em;
+	background-color: lightgray;
+}
+
+.wrapper {
+	display:flex;
+}
+
+.page {
+	background-color: #bcd4e6;
+	border: 1px dashed black;
+	margin: auto;
+	padding: 1em;
+	max-width: 800px;
+	min-width: 800px;
+}
+
+pre code.hljs {
+  display: block;
+}
+
+code.hljs {
+  display: inline;
+}
+
+table, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	font-size: 110%;
+	background: beige;
+	padding: 4px;
+}
+
+th {
+    background: lightgray;
+}
